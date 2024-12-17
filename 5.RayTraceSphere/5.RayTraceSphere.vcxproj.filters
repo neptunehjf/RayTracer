@@ -9,7 +9,10 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
+    <Filter Include="derivation">
+      <UniqueIdentifier>{3963c5e3-1393-44c8-ab01-52e3c2709810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="output">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
@@ -29,5 +32,15 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="output.ppm">
+      <Filter>output</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="derivation\sphere_hit.jpg">
+      <Filter>derivation</Filter>
+    </Image>
   </ItemGroup>
 </Project>
