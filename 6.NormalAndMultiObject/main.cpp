@@ -99,17 +99,17 @@ double hit_sphere(const point3& center, double radius, const ray& r)
     vec3 oc = center - o;
 
     // 转化为二项式求解未知数t的问题，推导过程参考derivation/sphere_hit.jpg
-    double a = dot(d, d);
-    double b = -2 * dot(d, oc);
-    double c = dot(oc, oc) - radius * radius;
+    double a = d.length_squared();
+    double h = dot(d, oc);
+    double c = oc.length_squared() - radius * radius;
 
-    double discriminant = b * b - 4 * a * c;
+    double discriminant = h * h - a * c;
 
     // 如果判别式等于0，则ray和sphere只有一个交点
     // 如果判别式大于0，则ray和sphere有两个交点
     // 如果判别式小于0，则ray和sphere有没有交点
     if (discriminant >= 0)
-        return (-b - sqrt(discriminant)) / (2.0 * a); //求t
+        return (h - sqrt(discriminant)) / a; //求t
 
     // 若无交点，返回负值
     return -1.0;

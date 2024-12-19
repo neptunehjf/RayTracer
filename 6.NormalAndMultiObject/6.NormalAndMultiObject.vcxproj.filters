@@ -38,4 +38,9 @@
       <Filter>Derivation</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="output.ppm">
+      <Filter>Output</Filter>
+    </None>
+  </ItemGroup>
 </Project>

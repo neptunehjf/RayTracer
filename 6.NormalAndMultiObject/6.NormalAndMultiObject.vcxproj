@@ -137,6 +137,9 @@
   <ItemGroup>
     <Image Include="derivation\sphere_hit.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="output.ppm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
