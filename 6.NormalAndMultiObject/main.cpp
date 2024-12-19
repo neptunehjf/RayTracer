@@ -3,7 +3,7 @@
 #include "ray.h"
 
 color ray_color(const ray& r);
-bool is_sphere_hit(const point3& center, double radius, const ray& r);
+double hit_sphere(const point3& center, double radius, const ray& r);
 
 int main() {
 
@@ -58,10 +58,29 @@ int main() {
 // 计算光线的颜色
 color ray_color(const ray& r)
 {
-    // 如果光线与球体相交，则光线为红色
-    if (is_sphere_hit(point3(0.0, 0.0, -1.0), 0.5, r))
-        return color(1.0, 0.0, 0.0);
+    // 球
+    point3 center(0.0, 0.0, -1.0);
+    double radius = 0.5;
 
+    // 如果光线与球体相交，则光线为红色
+    double t = hit_sphere(center, radius, r);
+    if (t > 0)
+    {
+        // ray和sphere的交点
+        point3 p = r.at(t);
+        // 球心到交点的向量自然是法向量
+        vec3 normal = p - center;
+
+        // 1.注意这里并没用unit_vector方法计算normal，这样可以减少sqrt运算，提升效率
+        // 2.不需要normalize的地方就尽量不要normalize
+        //normal = unit_vector(normal);  
+        normal /= radius; 
+        // [-1.0, 1.0] ==> [0.0, 1.0]
+        normal = 0.5 * (normal + vec3(1.0, 1.0, 1.0));
+
+        return normal;
+    }
+        
     // 以下为背景色
     // 根据r的y分量进行lerp
     vec3 r_uint = unit_vector(r.direction());
@@ -72,8 +91,8 @@ color ray_color(const ray& r)
     return (1 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);;
 }
 
-// 判断ray是否和球相交
-bool is_sphere_hit(const point3& center, double radius, const ray& r)
+// 求出ray和sphere最近的交点对应的t值
+double hit_sphere(const point3& center, double radius, const ray& r)
 {
     point3 o = r.origin();
     vec3 d = r.direction();
@@ -90,7 +109,8 @@ bool is_sphere_hit(const point3& center, double radius, const ray& r)
     // 如果判别式大于0，则ray和sphere有两个交点
     // 如果判别式小于0，则ray和sphere有没有交点
     if (discriminant >= 0)
-        return true;
+        return (-b - sqrt(discriminant)) / (2.0 * a); //求t
 
-    return false;
+    // 若无交点，返回负值
+    return -1.0;
 }

@@ -33,4 +33,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="derivation\sphere_hit.jpg">
+      <Filter>Derivation</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
