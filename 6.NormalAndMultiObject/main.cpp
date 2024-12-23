@@ -1,8 +1,8 @@
-#include "vec3.h"
-#include "color.h"
-#include "ray.h"
+#include "common.h"
+#include "hittable_list.h"
+#include "sphere.h"
 
-color ray_color(const ray& r);
+color ray_color(const ray& r, const hittable_list& scene);
 double hit_sphere(const point3& center, double radius, const ray& r);
 
 int main() {
@@ -12,6 +12,14 @@ int main() {
     int image_width = 400;
     int image_height = (int) (image_width / aspect_radio); // 因为是近似计算，有可能是0
     image_height = (image_height < 1) ? 1 : image_height;  // 保证不小于1
+
+    // Scene
+    hittable_list scene;
+
+    // 注意这里point3(0.0, 0.0, -1.0)是右值
+    // 所以sphere构造函数的入参要么是const point3&，要么是point&&，否则编译报错
+    scene.add(make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5));
+    scene.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0));
 
     // Camera
     vec3 cam_pos = { 0.0, 0.0, 0.0 };
@@ -48,7 +56,7 @@ int main() {
             ray r(cam_pos, ray_dir);
 
             // 根据ray算出color
-            color pixel_color = ray_color(r);
+            color pixel_color = ray_color(r, scene);
             write_color(cout, pixel_color);
         }
     }
@@ -56,29 +64,19 @@ int main() {
 }
 
 // 计算光线的颜色
-color ray_color(const ray& r)
+color ray_color(const ray& r, const hittable_list& scene)
 {
     // 球
     point3 center(0.0, 0.0, -1.0);
     double radius = 0.5;
 
-    // 如果光线与球体相交，则光线为红色
-    double t = hit_sphere(center, radius, r);
-    if (t > 0)
+    // 返回光线与物体交点的法线
+    hit_record rec;
+    if (scene.hit(r, 0.0, inf, rec))
     {
-        // ray和sphere的交点
-        point3 p = r.at(t);
-        // 球心到交点的向量自然是法向量
-        vec3 normal = p - center;
-
-        // 1.注意这里并没用unit_vector方法计算normal，这样可以减少sqrt运算，提升效率
-        // 2.不需要normalize的地方就尽量不要normalize
-        //normal = unit_vector(normal);  
-        normal /= radius; 
+        // 法线在几何阶段(hit)已经计算好了
         // [-1.0, 1.0] ==> [0.0, 1.0]
-        normal = 0.5 * (normal + vec3(1.0, 1.0, 1.0));
-
-        return normal;
+        return 0.5 * (rec.normal + vec3(1.0, 1.0, 1.0));
     }
         
     // 以下为背景色

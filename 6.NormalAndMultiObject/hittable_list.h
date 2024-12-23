@@ -1,9 +1,9 @@
 #pragma once
 
+#include "common.h"
 #include "hittable.h"
 
-#include <memory>
-#include <vector>
+
 
 // hittable_list是一系列hittable物体的集合，但如果把这个集合看作一个整体的话，也应该继承hittable物体的性质
 // 物体被抽象成hittable了，没有形状，因此hittable_list不关心也没办法 判定hit
@@ -16,8 +16,9 @@ public:
 	vector<shared_ptr<hittable>> objects;
 
 	hittable_list() {}
-	hittable_list(shared_ptr<hittable> object) { objects.push_back(object); }
+	hittable_list(shared_ptr<hittable> object) { add(object); }
 
+	void add(shared_ptr<hittable> object) { objects.push_back(object); }
 	void clear() { objects.clear(); }
 
 	// override hittable
@@ -32,11 +33,11 @@ public:
 
 		for (const auto& object : objects)
 		{
-			is_hit = object->hit(r, ray_tmin, closest_t, temp_rec);
-			if (is_hit)
+			if (object->hit(r, ray_tmin, closest_t, temp_rec))
 			{
 				closest_t = temp_rec.t;
 				rec = temp_rec;
+				is_hit = true;
 			}		
 		}
 

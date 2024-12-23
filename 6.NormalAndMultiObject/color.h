@@ -1,7 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include "vec3.h"
+#include "common.h"
 
 // 给vec3起一个别名，主要是为了把几何与颜色区分开
 using color = vec3;

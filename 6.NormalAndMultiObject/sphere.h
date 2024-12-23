@@ -1,11 +1,12 @@
 #pragma once
 
+#include "common.h"
 #include "hittable.h"
 
 class sphere : public hittable
 {
 public:
-	sphere(point3& center, double radius) : center(center), radius(fmax(0.0, radius)) {}
+	sphere(const point3& center, double radius) : center(center), radius(fmax(0.0, radius)) {}
 
 	// 显示加override关键字的好处是，一是可读性好，二是编译器会当作重写函数来检查
 	bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override
@@ -41,6 +42,8 @@ public:
 
             // 传出交点的记录
             rec.p = r.at(t);
+            // 1.注意这里并没用unit_vector方法计算outward_normal，这样可以减少sqrt运算，提升效率
+            // 2.不需要normalize的地方就尽量不要normalize
             vec3 outward_normal = (rec.p - center) / radius; 
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
