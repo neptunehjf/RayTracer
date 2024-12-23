@@ -23,3 +23,4 @@ double degree_to_radian(double degree)
 #include "vec3.h"
 #include "color.h"
 #include "ray.h"
+#include "interval.h"

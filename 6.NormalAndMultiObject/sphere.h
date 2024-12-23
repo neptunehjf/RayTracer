@@ -9,7 +9,7 @@ public:
 	sphere(const point3& center, double radius) : center(center), radius(fmax(0.0, radius)) {}
 
 	// 显示加override关键字的好处是，一是可读性好，二是编译器会当作重写函数来检查
-	bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override
+	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
 	{
         point3 o = r.origin();
         vec3 d = r.direction();
@@ -33,9 +33,9 @@ public:
             t_max = (h + sqrt(discriminant)) / a;
 
             // 求在ray_tmin~ray_tmax范围内的最近的交点
-            if ((t_min > ray_tmin && t_min < ray_tmax))
+            if (ray_t.surrounds(t_min))
                 t = t_min;
-            else if ((t_min > ray_tmin && t_min < ray_tmax))
+            else if (ray_t.surrounds(t_max))
                 t = t_max;
             else
                 return false;

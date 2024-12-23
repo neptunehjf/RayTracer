@@ -72,7 +72,8 @@ color ray_color(const ray& r, const hittable_list& scene)
 
     // 返回光线与物体交点的法线
     hit_record rec;
-    if (scene.hit(r, 0.0, inf, rec))
+    interval ray_t(0.0, inf);
+    if (scene.hit(r, ray_t, rec))
     {
         // 法线在几何阶段(hit)已经计算好了
         // [-1.0, 1.0] ==> [0.0, 1.0]
