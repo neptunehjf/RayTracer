@@ -39,7 +39,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="derivation\sphere_hit.jpg">
+    <Image Include="..\derivation\quadratic_simplify.jpg">
+      <Filter>derivation</Filter>
+    </Image>
+    <Image Include="..\derivation\sphere_hit.jpg">
       <Filter>derivation</Filter>
     </Image>
   </ItemGroup>

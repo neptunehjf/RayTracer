@@ -49,16 +49,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="derivation\sphere_hit.jpg">
-      <Filter>Derivation</Filter>
-    </Image>
-    <Image Include="derivation\quadratic_simplify.jpg">
-      <Filter>Derivation</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="output.ppm">
       <Filter>Output</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\derivation\quadratic_simplify.jpg">
+      <Filter>Derivation</Filter>
+    </Image>
+    <Image Include="..\derivation\sphere_hit.jpg">
+      <Filter>Derivation</Filter>
+    </Image>
   </ItemGroup>
 </Project>
