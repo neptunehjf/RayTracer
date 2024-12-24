@@ -8,6 +8,7 @@ class camera
 public:
 	double aspect_radio = 1.0;
 	int image_width = 100;
+    int sample_nums = 10;
 
     // 光追的渲染是和camera绑定的，因此把render放到camera类里
 	void render(const hittable_list& scene)
@@ -23,13 +24,18 @@ public:
 
             for (int i = 0; i < image_width; i++)
             {
-                // 求出每一个camera到像素中心的射线
-                point3 pixel = pixel_zero + vec3(i * pixel_x, j * pixel_y, 0.0);
-                vec3 ray_dir = pixel - cam_pos;
-                ray r(cam_pos, ray_dir);
+                color pixel_color;
 
-                // 根据ray算出color
-                color pixel_color = ray_color(r, scene);
+                for (int n = 0; n < sample_nums; n++)
+                {
+                    // 求出每一个camera到像素中心附近的随机采样到的射线
+                    ray r = get_ray(i, j);
+
+                    // 根据ray算出color，累加起来，最后除以采样数以达到平滑的效果
+                    pixel_color += ray_color(r, scene);
+                }
+
+                pixel_color /= sample_nums;
                 write_color(cout, pixel_color);
             }
         }
@@ -66,6 +72,22 @@ private:
         // 转为像素的中心坐标
         pixel_zero = viewport_zero + vec3(0.5 * pixel_x, 0.5 * pixel_y, 0.0);
 	}
+
+    // 获取在以i,j处的像素的中心为中心，xy上的方形区域(-0.5,0.5)内随机采样的光线ray
+    ray get_ray(int i, int j) const
+    {
+        vec3 offset = offset_square();
+        point3 pixel = pixel_zero + vec3((i + offset.x()) * pixel_x, (j + offset.y()) * pixel_y, 0.0);
+        vec3 ray_dir = pixel - cam_pos;
+        return ray(cam_pos, ray_dir);
+    }
+
+    // 生成一个在xy方向上的随机偏移量，在-0.5,0.5之间 Z方向无偏移量
+    // 可用于在方形区域随机采样
+    vec3 offset_square() const
+    {
+        return vec3(-0.5 + random_double(), -0.5 + random_double(), 0.0);
+    }
 
     // 计算光线的颜色
     color ray_color(const ray& r, const hittable_list& scene)

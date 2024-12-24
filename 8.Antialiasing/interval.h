@@ -15,6 +15,14 @@ public:
 
 	double surrounds(double x) const { return (min < x && x < max); }
 
+	double clamp(double x) const
+	{
+		if (x < min)
+			return min;
+		else if (x > max)
+			return max;
+	}
+
 	// 声明和类相同类型的静态变量是合法的，不会导致递归定义
 	static const interval empty, universe;
 };
