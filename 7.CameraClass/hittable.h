@@ -11,7 +11,7 @@ public:
 
 	// 判断ray是从物体外部还是内部打过来的
 	// 当前情况下，在几何阶段做判断结果并存储可能是一种比较高效的选择
-	bool front_face; 
+	bool front_face = true; 
 
 	// 根据ray和外部法线的方向判断当前光线是从内部还是外部来的，以及求实际的normal
 	void set_face_normal(const ray& r, vec3 outward_normal)
