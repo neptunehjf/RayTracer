@@ -8,7 +8,8 @@ class camera
 public:
 	double aspect_radio = 1.0;
 	int image_width = 100;
-    int sample_nums = 10;
+    int sample_num = 10;
+    int bounce_limit = 10;
 
     // 光追的渲染是和camera绑定的，因此把render放到camera类里
 	void render(const hittable_list& scene)
@@ -26,16 +27,16 @@ public:
             {
                 color pixel_color;
 
-                for (int n = 0; n < sample_nums; n++)
+                for (int n = 0; n < sample_num; n++)
                 {
                     // 求出每一个camera到像素中心附近的随机采样到的射线
                     ray r = get_ray(i, j);
 
                     // 根据ray算出color，累加起来，最后除以采样数以达到平滑的效果
-                    pixel_color += ray_color(r, scene);
+                    pixel_color += ray_color(r, scene, 0);
                 }
 
-                pixel_color /= sample_nums;
+                pixel_color /= sample_num;
                 write_color(cout, pixel_color);
             }
         }
@@ -94,16 +95,26 @@ private:
     }
 
     // 计算光线的颜色
-    color ray_color(const ray& r, const hittable_list& scene)
+    color ray_color(const ray& r, const hittable_list& scene, int bounce_count)
     {
+        // 给弹射加一个条件限制，防止无限弹射下去
+        if (bounce_count >= bounce_limit)
+            return vec3(0.0, 0.0, 0.0);
+
         // 返回光线与物体交点的法线
         hit_record rec;
-        interval ray_t(0.0, inf);
+        // 因为浮点数精度的原因，交点可能不会正好在物体表面，交点有可能在物体外部也有可能在内部
+        // 如果交点在物体内部的话，以tmin为0进行计算就不对了，要把tmin修正为稍大的值
+        // 以上修正解决了shadow acne的问题
+        interval ray_t(0.001, inf);
         if (scene.hit(r, ray_t, rec))
         {
-            // 法线在几何阶段(hit)已经计算好了
-            // [-1.0, 1.0] ==> [0.0, 1.0]
-            return 0.5 * (rec.normal + vec3(1.0, 1.0, 1.0));
+            // Diffuse材质 会吸收0.5的光线并反射0.5的光线，反射方向随机
+            // 光线可在物体间反弹
+            // 光源还没有定义，暂时用背景色来代替
+            // 参考derivation/simple diffuse.png
+            vec3 v = random_on_hemisphere(rec.normal);
+            return 0.5 * ray_color(ray(rec.p, v), scene, ++bounce_count);
         }
 
         // 以下为背景色

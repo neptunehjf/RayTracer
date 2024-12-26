@@ -28,6 +28,14 @@ inline double random_double()
 	return distribution(generator);
 }
 
+inline double random_double(double min, double max)
+{
+	// 这里全局只需1个种子，1个伪随机数列，因此加static修饰       
+	static uniform_real_distribution<double> distribution(min, max);
+	static mt19937 generator;
+	return distribution(generator);
+}
+
 // Common Headers
 #include "vec3.h"
 #include "color.h"

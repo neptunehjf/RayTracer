@@ -9,6 +9,7 @@ int main()
     camera cam;
     cam.aspect_radio = 16.0 / 9.0;
     cam.image_width = 400;
+    cam.bounce_limit = 50;
 
     // Scene
     hittable_list scene;

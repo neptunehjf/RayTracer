@@ -52,6 +52,15 @@ public:
 		return (e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
 	}
 
+	static vec3 random()
+	{
+		return vec3(random_double(), random_double(), random_double());
+	}
+
+	static vec3 random(double min, double max)
+	{
+		return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+	}
 	
 };
 
@@ -118,4 +127,36 @@ inline vec3 cross(const vec3& u, const vec3& v)
 inline vec3 unit_vector(const vec3& v) 
 {
 	return v / v.length();
+}
+
+// 用rejection method求一个球体内部的均匀随机的单位向量
+// 为啥是球体？显然3d空间中均匀的随机向量应该分布在球体内
+// 先直接根据随机向量-1.0，1.0构造，可得一个立方体内的随机向量
+// 但立方体内部的随机向量不是均匀的，因此需要排除掉在立方体内而在球体外的部分
+// 这种算法相当于排除法，比较简单，只是有可能反复reject,影响采样效率
+// 参考derivation/rejection method.png
+inline vec3 random_unit_vector()
+{
+	while (true)
+	{
+		vec3 v = vec3::random(-1.0, 1.0);
+		double lensq = v.length_squared();
+		// 防止double精度不够导致的lensq等于0，导致除数为0的bug
+		// 对于double类型，大于1e-160都可以识别
+		if (1e-160 < lensq && lensq <= 1.0)
+		{
+			return v / sqrt(lensq);
+		}
+	}
+}
+
+// 如果随机向量指向平面内部，则反转该向量
+inline vec3 random_on_hemisphere(const vec3& normal)
+{
+	vec3 v = random_unit_vector();
+
+	if (dot(v, normal) > 0.0)
+		return v;
+	else
+		return -v;
 }
