@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Derivation">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Output">
       <UniqueIdentifier>{b3f7e44c-160a-4e12-b348-8c3f8b376b6f}</UniqueIdentifier>
     </Filter>
@@ -52,13 +48,5 @@
     <None Include="output.ppm">
       <Filter>Output</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\derivation\quadratic_simplify.jpg">
-      <Filter>Derivation</Filter>
-    </Image>
-    <Image Include="..\derivation\sphere_hit.jpg">
-      <Filter>Derivation</Filter>
-    </Image>
   </ItemGroup>
 </Project>
