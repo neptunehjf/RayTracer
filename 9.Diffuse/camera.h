@@ -109,12 +109,16 @@ private:
         interval ray_t(0.001, inf);
         if (scene.hit(r, ray_t, rec))
         {
+            // 根据lambertian reflection模型算出的随机反射方向，和normal夹角越小，概率越大
+            // 参考referrence/lambertian reflection.png
+            point3 pn = rec.p + rec.normal;
+            vec3 dir = pn + random_unit_vector();
+
             // Diffuse材质 会吸收0.5的光线并反射0.5的光线，反射方向随机
             // 光线可在物体间反弹
             // 光源还没有定义，暂时用背景色来代替
-            // 参考derivation/simple diffuse.png
-            vec3 v = random_on_hemisphere(rec.normal);
-            return 0.5 * ray_color(ray(rec.p, v), scene, ++bounce_count);
+            // 参考referrence/simple diffuse.png
+            return 0.5 * ray_color(ray(rec.p, dir), scene, ++bounce_count);
         }
 
         // 以下为背景色

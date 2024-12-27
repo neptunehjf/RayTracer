@@ -134,7 +134,7 @@ inline vec3 unit_vector(const vec3& v)
 // 先直接根据随机向量-1.0，1.0构造，可得一个立方体内的随机向量
 // 但立方体内部的随机向量不是均匀的，因此需要排除掉在立方体内而在球体外的部分
 // 这种算法相当于排除法，比较简单，只是有可能反复reject,影响采样效率
-// 参考derivation/rejection method.png
+// 参考referrence/rejection method.png
 inline vec3 random_unit_vector()
 {
 	while (true)

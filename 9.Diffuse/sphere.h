@@ -15,8 +15,8 @@ public:
         vec3 d = r.direction();
         vec3 oc = center - o;
 
-        // 转化为二项式求解未知数t的问题，推导过程参考derivation/sphere_hit.jpg
-        // 简化过程参考derivation/quadratic_simplify.jpg
+        // 转化为二项式求解未知数t的问题，推导过程参考referrence/sphere_hit.jpg
+        // 简化过程参考referrence/quadratic_simplify.jpg
         double a = d.length_squared();
         double h = dot(d, oc);
         double c = oc.length_squared() - radius * radius;
