@@ -6,7 +6,7 @@
 class sphere : public hittable
 {
 public:
-	sphere(const point3& center, double radius) : center(center), radius(fmax(0.0, radius)) {}
+	sphere(const point3& center, double radius, shared_ptr<material> mat) : center(center), radius(fmax(0.0, radius)), mat(mat) {}
 
 	// 显示加override关键字的好处是，一是可读性好，二是编译器会当作重写函数来检查
 	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
@@ -47,6 +47,7 @@ public:
             vec3 outward_normal = (rec.p - center) / radius; 
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
+            rec.mat = mat;
             return true;
         }
             
@@ -56,4 +57,5 @@ public:
 private:
 	point3 center;  // 球心
     double radius;  // 半径
+    shared_ptr<material> mat; //材质
 };

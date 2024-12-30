@@ -52,6 +52,13 @@ public:
 		return (e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
 	}
 
+	bool near_zero() const
+	{
+		double a = 1e-8; //1乘10的-8次方
+
+		return (fabs(e[0] < a) && fabs(e[1] < a) && fabs(e[2] < a));
+	}
+
 	static vec3 random()
 	{
 		return vec3(random_double(), random_double(), random_double());
@@ -159,4 +166,11 @@ inline vec3 random_on_hemisphere(const vec3& normal)
 		return v;
 	else
 		return -v;
+}
+
+// 根据入射方向和法线方向求镜面反射方向
+// 参考referrence/mirror reflection.jpg
+inline vec3 reflect(const vec3& v, const vec3& normal)
+{
+	return v - 2 * dot(v, normal) * normal;
 }
