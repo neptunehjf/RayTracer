@@ -48,12 +48,16 @@ private:
 class metal : public material
 {
 public:
-	metal(const color& albedo) : albedo(albedo) {}
+	metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1.0 ? fuzz : 1.0) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
 		color& attenuation, ray& ray_out) const override
 	{
 		vec3 dir = reflect(ray_in.direction(), rec.normal);
+		// fuzz:金属反射后再进行一次方向随机，使金属看起来有磨砂效果
+		// 参考：referrence/fuzzy reflection.png
+		// 注意，这里需要根据fuzz的值来确定效果的程度，所以其他的因子(dir向量，fuzz的向量)要是归一化的，fuzz的值才有意义
+		dir = unit_vector(dir) + fuzz * random_unit_vector();
 		ray_out = ray(rec.p, dir);
 		attenuation = albedo;
 
@@ -62,4 +66,5 @@ public:
 
 private:
 	color albedo;
+	double fuzz;
 };
