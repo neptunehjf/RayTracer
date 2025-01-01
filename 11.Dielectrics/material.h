@@ -84,9 +84,11 @@ public:
 		double sin_theta = sqrt(1 - cos_theta * cos_theta);
 
 		vec3 out_dir;
-		if (ri * sin_theta > 1.0)
+
+		// 全内反射，参考referrence/total internal reflection.png
+		// Schlick's approximation，模拟Fresnel现象，这里暂时用简单的random_double()引入随机性
+		if (ri * sin_theta > 1.0 || reflectance(cos_theta, ri) > random_double())
 		{
-			// 全内反射，参考referrence/total internal reflection.png
 			out_dir = reflect(unit_v, rec.normal);
 		}
 		else
@@ -105,7 +107,16 @@ public:
 	}
 
 private:
-	// 被折射介质的内外折射系数之比
+	// 被折射介质的内外的相对折射率
 	// 注意空气在介质外的时候，分母可忽略，因为系数是1.0
 	double refraction_index;
+
+	// 求反射率。根据Fresnel现象，grazing角度观察，反光越强
+	static double reflectance(double cos_theta, double ri) 
+	{
+		// Schlick's approximation 参考referrence/schlick approximation.png
+		double r0 = (1 - ri) / (1 + ri);
+		r0 = r0 * r0;
+		return r0 + (1 - r0) * pow((1 - cos_theta), 5);
+	}
 };

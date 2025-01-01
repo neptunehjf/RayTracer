@@ -178,7 +178,7 @@ inline vec3 reflect(const vec3& v, const vec3& normal)
 
 // 根据入射方向和法线方向求折射方向，前提是假设入射光，折射光，法线都是单位向量
 // 参考referrence/refraction.jpg
-// unit_v:入射光，必须是单位向量 uint_n:表面法线，必须是单位向量 ri:被折射介质的内外折射系数之比
+// unit_v:入射光，必须是单位向量 uint_n:表面法线，必须是单位向量 ri:被折射介质的内外的相对折射率
 // 对dot求cos操作加了fmin为1的限制，对sqrt操作加了fabs限制，提高健壮性
 inline vec3 refract(const vec3& unit_v, const vec3& uint_n, double ri)
 {
