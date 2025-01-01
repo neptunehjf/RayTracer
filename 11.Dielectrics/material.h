@@ -29,13 +29,13 @@ public:
 	{
 		// 根据lambertian reflection模型算出的随机反射方向，和normal夹角越小，概率越大
 		// 参考referrence/lambertian reflection.png
-		vec3 dir = rec.normal + random_unit_vector();
+		vec3 out_dir = rec.normal + random_unit_vector();
 
 		//防止dir是0向量的情况
-		if (dir.near_zero())
-			dir = rec.normal;
+		if (out_dir.near_zero())
+			out_dir = rec.normal;
 
-		ray_out = ray(rec.p, dir);
+		ray_out = ray(rec.p, out_dir);
 		attenuation = albedo;
 
 		return true;
@@ -53,12 +53,12 @@ public:
 	bool scatter(const ray& ray_in, const hit_record& rec,
 		color& attenuation, ray& ray_out) const override
 	{
-		vec3 dir = reflect(ray_in.direction(), rec.normal);
+		vec3 out_dir = reflect(ray_in.direction(), rec.normal);
 		// fuzz:金属反射后再进行一次方向随机，使金属看起来有磨砂效果
 		// 参考：referrence/fuzzy reflection.png
 		// 注意，这里需要根据fuzz的值来确定效果的程度，所以其他的因子(dir向量，fuzz的向量)要是归一化的，fuzz的值才有意义
-		dir = unit_vector(dir) + fuzz * random_unit_vector();
-		ray_out = ray(rec.p, dir);
+		out_dir = unit_vector(out_dir) + fuzz * random_unit_vector();
+		ray_out = ray(rec.p, out_dir);
 		attenuation = albedo;
 
 		return true;
@@ -79,10 +79,24 @@ public:
 	{
 		double ri = rec.front_face ? (1.0 / refraction_index) : refraction_index;
 
-		// 这里向量入参皆为单位向量
-		vec3 dir = refract(unit_vector(ray_in.direction()), rec.normal, ri);
+		vec3 unit_v = unit_vector(ray_in.direction());
+		double cos_theta = fmin(dot(-unit_v, rec.normal), 1.0);
+		double sin_theta = sqrt(1 - cos_theta * cos_theta);
 
-		ray_out = ray(rec.p, dir);
+		vec3 out_dir;
+		if (ri * sin_theta > 1.0)
+		{
+			// 全内反射，参考referrence/total internal reflection.png
+			out_dir = reflect(unit_v, rec.normal);
+		}
+		else
+		{
+			// 折射
+			// 这里向量入参皆为单位向量
+			out_dir = refract(unit_v, rec.normal, ri);
+		}
+
+		ray_out = ray(rec.p, out_dir);
 
 		// 不吸收能量，全部反射或者折射
 		attenuation = color(1.0, 1.0, 1.0); 
