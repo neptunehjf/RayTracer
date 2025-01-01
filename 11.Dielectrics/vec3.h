@@ -170,7 +170,21 @@ inline vec3 random_on_hemisphere(const vec3& normal)
 
 // 根据入射方向和法线方向求镜面反射方向
 // 参考referrence/mirror reflection.jpg
+// 入射光 法线 不需要是单位向量
 inline vec3 reflect(const vec3& v, const vec3& normal)
 {
 	return v - 2 * dot(v, normal) * normal;
 }
+
+// 根据入射方向和法线方向求折射方向，前提是假设入射光，折射光，法线都是单位向量
+// 参考referrence/refraction.jpg
+// unit_v:入射光，必须是单位向量 uint_n:表面法线，必须是单位向量 ri:被折射介质的内外折射系数之比
+// 对dot求cos操作加了fmin为1的限制，对sqrt操作加了fabs限制，提高健壮性
+inline vec3 refract(const vec3& unit_v, const vec3& uint_n, double ri)
+{
+	double cos_theta = fmin(dot(-unit_v, uint_n), 1.0);
+	vec3 out_perp = ri * (unit_v + uint_n * cos_theta);
+	vec3 out_para = -sqrt(fabs(1.0 - out_perp.length_squared())) * uint_n;
+	return out_perp + out_para;
+}
+

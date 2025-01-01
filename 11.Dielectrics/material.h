@@ -68,3 +68,30 @@ private:
 	color albedo;
 	double fuzz;
 };
+
+class dielectrics : public material
+{
+public:
+	dielectrics(double refraction_index) : refraction_index(refraction_index) {}
+
+	bool scatter(const ray& ray_in, const hit_record& rec,
+		color& attenuation, ray& ray_out) const override
+	{
+		double ri = rec.front_face ? (1.0 / refraction_index) : refraction_index;
+
+		// 这里向量入参皆为单位向量
+		vec3 dir = refract(unit_vector(ray_in.direction()), rec.normal, ri);
+
+		ray_out = ray(rec.p, dir);
+
+		// 不吸收能量，全部反射或者折射
+		attenuation = color(1.0, 1.0, 1.0); 
+
+		return true;
+	}
+
+private:
+	// 被折射介质的内外折射系数之比
+	// 注意空气在介质外的时候，分母可忽略，因为系数是1.0
+	double refraction_index;
+};
