@@ -36,7 +36,7 @@ public:
 
             for (int i = 0; i < image_width; i++)
             {
-                color pixel_color;
+                color pixel_color = vec3(0.0, 0.0, 0.0);
 
                 for (int n = 0; n < sample_num; n++)
                 {
@@ -71,7 +71,6 @@ private:
       
         cam_pos = look_from;
 
-        double focus_length = (look_from - look_at).length();
         double theta = degree_to_radian(vfov); // tan是按弧度值实现的，必须提供弧度制而不是角度值
         double viewport_h = 2 * focus_dist * tan(theta / 2); // 参考referrence/camera1.png
         double viewport_w = viewport_h * (double(image_width) / image_height); // 因为image_height是近似计算的，不能直接用aspect_radio
@@ -160,8 +159,8 @@ private:
 
     point3 defocus_disk_sample() const {
         // Returns a random point in the camera defocus disk.
-        vec3 v = random_on_unit_disk();
-        return cam_pos + (v[0] * defocus_disk_u) + (v[1] * defocus_disk_v);
+        vec3 p = random_on_unit_disk();
+        return cam_pos + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v);
     }
 };
 

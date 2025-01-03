@@ -21,6 +21,8 @@ public:
 			return min;
 		else if (x > max)
 			return max;
+		else
+			return x;
 	}
 
 	// 声明和类相同类型的静态变量是合法的，不会导致递归定义
