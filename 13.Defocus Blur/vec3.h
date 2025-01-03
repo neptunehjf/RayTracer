@@ -157,6 +157,17 @@ inline vec3 random_unit_vector()
 	}
 }
 
+inline vec3 random_on_unit_disk()
+{
+	while (true)
+	{
+		vec3 v = vec3(random_double(-1.0, 1.0), random_double(-1.0, 1.0), 0.0);
+
+		if (v.length_squared() <= 1.0)
+			return v;
+	}
+}
+
 // 如果随机向量指向平面内部，则反转该向量
 inline vec3 random_on_hemisphere(const vec3& normal)
 {

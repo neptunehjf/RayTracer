@@ -17,6 +17,11 @@ public:
     point3 look_at   = point3(0.0, 0.0, -1.0);  // cam视线终点
     point3 vup       = vec3(0.0, 1.0, 0.0);     // cam整体的上方向
 
+    // referrence/defocus model_1.png
+    // 透镜(散焦disk)越大，在里焦距越远的地方成像越模糊
+    double defocus_angle = 0.0;    // 角度，和焦距一起决定了透镜的大小
+    double focus_dist = 10.0;      // 完美成像的焦距
+
     // 光追的渲染是和camera绑定的，因此把render放到camera类里
 	void render(const hittable_list& scene)
 	{
@@ -56,6 +61,8 @@ private:
     vec3 pixel_v;
     point3 cam_pos;
     vec3 u, v, w;
+    vec3 defocus_disk_u; // 透镜u向量
+    vec3 defocus_disk_v; // 透镜v向量
 
 	void initialize()
 	{
@@ -63,9 +70,10 @@ private:
         image_height = (image_height < 1) ? 1 : image_height;  // 保证不小于1
       
         cam_pos = look_from;
-        double focal_length = (look_from - look_at).length(); // 焦距，camera和viewport之间的距离
+
+        double focus_length = (look_from - look_at).length();
         double theta = degree_to_radian(vfov); // tan是按弧度值实现的，必须提供弧度制而不是角度值
-        double viewport_h = 2.0 * focal_length * tan(theta / 2.0); // 参考referrence/camera1.png
+        double viewport_h = 2 * focus_dist * tan(theta / 2); // 参考referrence/camera1.png
         double viewport_w = viewport_h * (double(image_width) / image_height); // 因为image_height是近似计算的，不能直接用aspect_radio
 
         // 确定camera归一化空间坐标
@@ -83,9 +91,15 @@ private:
         pixel_v = viewport_v / image_height;
 
         // 计算viewport原点在camera坐标系的位置，viewport原点在左上角，离相机距离focal_length，在xy平面，相机位置和viewport中心重合
-        point3 viewport_zero = cam_pos - (w * focal_length) - (viewport_u / 2.0) - (viewport_v / 2.0);
+        point3 viewport_zero = cam_pos - (w * focus_dist) - (viewport_u / 2) - (viewport_v / 2);
         // 转为像素的中心坐标
         pixel_zero = viewport_zero + 0.5 * (pixel_u + pixel_v);
+
+        // 计算透镜的uv向量
+        // referrence/defocus model_2.jpg
+        double defocus_radius = focus_dist * tan(degree_to_radian(defocus_angle / 2));
+        defocus_disk_u = u * defocus_radius;
+        defocus_disk_v = v * defocus_radius;
 	}
 
     // 获取在以i,j处的像素的中心为中心，xy上的方形区域(-0.5 pixel ,0.5 pixel)内随机采样的光线ray
@@ -98,8 +112,9 @@ private:
         vec3 offset = offset_square();
         point3 pixel = pixel_zero + ((i + offset.x()) * pixel_u) 
                                   + ((j + offset.y()) * pixel_v);
-        vec3 ray_dir = pixel - cam_pos;
-        return ray(cam_pos, ray_dir);
+        point3 ray_origin = (defocus_angle <= 0) ? cam_pos : defocus_disk_sample();
+        vec3 ray_dir = pixel - ray_origin;
+        return ray(ray_origin, ray_dir);
     }
 
     // 生成一个在xy方向上的随机偏移量，在-0.5,0.5之间 Z方向无偏移量
@@ -142,4 +157,11 @@ private:
         // 返回蓝色与白色之间的lerp
         return (1 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
     }
+
+    point3 defocus_disk_sample() const {
+        // Returns a random point in the camera defocus disk.
+        vec3 v = random_on_unit_disk();
+        return cam_pos + (v[0] * defocus_disk_u) + (v[1] * defocus_disk_v);
+    }
 };
+
