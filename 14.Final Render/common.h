@@ -22,17 +22,19 @@ inline double degree_to_radian(double degree)
 
 inline double random_double()
 {
-	// 这里全局只需1个种子，1个伪随机数列，因此加static修饰       
-	static uniform_real_distribution<double> distribution(0.0, 1.0);
+	// 这里全局只需1个种子，1个伪随机数列，因此加static修饰   
 	static mt19937 generator;
+	// 因为范围是固定的(0.0, 1.0)，只初始化一次就好
+	static uniform_real_distribution<double> distribution(0.0, 1.0);
 	return distribution(generator);
 }
 
 inline double random_double(double min, double max)
 {
-	// 这里全局只需1个种子，1个伪随机数列，因此加static修饰       
-	static uniform_real_distribution<double> distribution(min, max);
+	// 这里全局只需1个种子，1个伪随机数列，因此加static修饰   
 	static mt19937 generator;
+	// 因为范围是可变的，所以可能需要多次初始化，不能加static修饰！
+	uniform_real_distribution<double> distribution(min, max);
 	return distribution(generator);
 }
 

@@ -10,7 +10,7 @@ int main()
     camera cam;
     cam.aspect_radio = 16.0 / 9.0;
     cam.image_width = 1200;
-    cam.sample_num = 5;
+    cam.sample_num = 500;
     cam.bounce_limit = 50;
 
     cam.vfov = 20.0;
@@ -37,7 +37,6 @@ int main()
             if ((center - point3(4.0, 0.2, 0.0)).length() > 0.9) 
             {
                 shared_ptr<material> sphere_material;
-                shared_ptr<material> sphere_material_metal;
 
                 if (choose_mat < 0.8) 
                 {
@@ -49,10 +48,10 @@ int main()
                 else if (choose_mat < 0.95)
                 {
                     // metal
-                    //color albedo = color::random(0.5, 1.0);
-                    //double fuzz = random_double(0.0, 0.5);
-                    //sphere_material_metal = make_shared<metal>(albedo, fuzz);
-                    //scene.add(make_shared<sphere>(center, 0.2, sphere_material_metal));
+                    color albedo = color::random(0.5, 1.0);
+                    double fuzz = random_double(0.0, 0.5);
+                    sphere_material = make_shared<metal>(albedo, fuzz);
+                    scene.add(make_shared<sphere>(center, 0.2, sphere_material));
                 }
                 else 
                 {
