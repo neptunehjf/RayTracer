@@ -10,7 +10,13 @@ int main()
     camera cam;
     cam.aspect_radio = 16.0 / 9.0;
     cam.image_width = 400;
+    cam.sample_num = 10;
     cam.bounce_limit = 50;
+
+    cam.vfov = 20.0;
+    cam.look_from = point3(-2.0, 2.0, 1.0);
+    cam.look_at = point3(0.0, 0.0, -1.0);
+    cam.vup = vec3(0.0, 1.0, 0.0);
 
     // Scene
     hittable_list scene;

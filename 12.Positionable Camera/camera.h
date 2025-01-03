@@ -9,8 +9,13 @@ class camera
 public:
 	double aspect_radio = 1.0;
 	int image_width = 100;
-    int sample_num = 10;
+    int sample_num = 100;
     int bounce_limit = 10;
+
+    double vfov = 90.0;                         // 竖直方向的FOV
+    point3 look_from = point3(0.0, 0.0, 0.0);   // cam视线起点
+    point3 look_at   = point3(0.0, 0.0, -1.0);  // cam视线终点
+    point3 vup       = vec3(0.0, 1.0, 0.0);     // cam整体的上方向
 
     // 光追的渲染是和camera绑定的，因此把render放到camera类里
 	void render(const hittable_list& scene)
@@ -47,32 +52,40 @@ public:
 private:
     int image_height;
     point3 pixel_zero;
-    double pixel_x;
-    double pixel_y;
+    vec3 pixel_u;
+    vec3 pixel_v;
     point3 cam_pos;
+    vec3 u, v, w;
 
 	void initialize()
 	{
         image_height = (int)(image_width / aspect_radio); // 因为是近似计算，有可能是0
         image_height = (image_height < 1) ? 1 : image_height;  // 保证不小于1
-        cam_pos = point3(0.0, 0.0, 0.0);
-
-        double focal_length = 1.0; // 焦距，camera和viewport之间的距离，目前定为1.0
-        double viewport_h = 2.0;
+      
+        cam_pos = look_from;
+        double focal_length = (look_from - look_at).length(); // 焦距，camera和viewport之间的距离
+        double theta = degree_to_radian(vfov); // tan是按弧度值实现的，必须提供弧度制而不是角度值
+        double viewport_h = 2.0 * focal_length * tan(theta / 2.0); // 参考referrence/camera1.png
         double viewport_w = viewport_h * (double(image_width) / image_height); // 因为image_height是近似计算的，不能直接用aspect_radio
 
+        // 确定camera归一化空间坐标
+        // 参考referrence/camera2.png
+        w = unit_vector(look_from - look_at);
+        u = unit_vector(cross(vup, w)); // 因为v始终与vup共面，所以cross(vup, w)和cross(v, w)同向
+        v = cross(w, u);
+
         // viewport UV 在camera坐标系的向量
-        vec3 u = vec3(viewport_w, 0.0, 0.0);
-        vec3 v = vec3(0.0, -viewport_h, 0.0); // 因为viewport的所在的v方向和camera坐标系y方向相反
+        vec3 viewport_u = viewport_w * u;
+        vec3 viewport_v = -viewport_h * v; // 因为viewport的所在的v方向和camera坐标系v方向相反
 
         // 换算成每个pixel对应的uv大小
-        pixel_x = viewport_w / image_width;
-        pixel_y = -viewport_h / image_height;
+        pixel_u = viewport_u / image_width;
+        pixel_v = viewport_v / image_height;
 
         // 计算viewport原点在camera坐标系的位置，viewport原点在左上角，离相机距离focal_length，在xy平面，相机位置和viewport中心重合
-        point3 viewport_zero = cam_pos - vec3(0.0, 0.0, focal_length) - u / 2 - v / 2;
+        point3 viewport_zero = cam_pos - (w * focal_length) - (viewport_u / 2.0) - (viewport_v / 2.0);
         // 转为像素的中心坐标
-        pixel_zero = viewport_zero + vec3(0.5 * pixel_x, 0.5 * pixel_y, 0.0);
+        pixel_zero = viewport_zero + 0.5 * (pixel_u + pixel_v);
 	}
 
     // 获取在以i,j处的像素的中心为中心，xy上的方形区域(-0.5 pixel ,0.5 pixel)内随机采样的光线ray
@@ -83,7 +96,8 @@ private:
     ray get_ray(int i, int j) const
     {
         vec3 offset = offset_square();
-        point3 pixel = pixel_zero + vec3((i + offset.x()) * pixel_x, (j + offset.y()) * pixel_y, 0.0);
+        point3 pixel = pixel_zero + ((i + offset.x()) * pixel_u) 
+                                  + ((j + offset.y()) * pixel_v);
         vec3 ray_dir = pixel - cam_pos;
         return ray(cam_pos, ray_dir);
     }
