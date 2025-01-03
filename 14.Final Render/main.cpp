@@ -34,7 +34,9 @@ int main()
             double choose_mat = random_double();
             point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
 
-            if ((center - point3(4.0, 0.2, 0.0)).length() > 0.9) 
+            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 && // 去除了离大球过于接近的小球
+                (center - point3(-4.0, 0.2, 0.0)).length() > 1.0 &&
+                (center - point3(4.0, 0.2, 0.0)).length() > 1.0)
             {
                 shared_ptr<material> sphere_material;
 
