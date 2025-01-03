@@ -9,7 +9,7 @@ class camera
 public:
 	double aspect_radio = 1.0;
 	int image_width = 100;
-    int sample_num = 100;
+    int sample_num = 10;
     int bounce_limit = 10;
 
     double vfov = 90.0;                         // 竖直方向的FOV
