@@ -35,7 +35,8 @@ public:
 		if (out_dir.near_zero())
 			out_dir = rec.normal;
 
-		ray_out = ray(rec.p, out_dir);
+		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
+		ray_out = ray(rec.p, out_dir, ray_in.get_time());
 		attenuation = albedo;
 
 		return true;
@@ -58,7 +59,9 @@ public:
 		// 参考：referrence/fuzzy reflection.png
 		// 注意，这里需要根据fuzz的值来确定效果的程度，所以其他的因子(dir向量，fuzz的向量)要是归一化的，fuzz的值才有意义
 		out_dir = unit_vector(out_dir) + fuzz * random_unit_vector();
-		ray_out = ray(rec.p, out_dir);
+
+		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
+		ray_out = ray(rec.p, out_dir, ray_in.get_time());
 		attenuation = albedo;
 
 		return true;
@@ -98,7 +101,8 @@ public:
 			out_dir = refract(unit_v, rec.normal, ri);
 		}
 
-		ray_out = ray(rec.p, out_dir);
+		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
+		ray_out = ray(rec.p, out_dir, ray_in.get_time());
 
 		// 不吸收能量，全部反射或者折射
 		attenuation = color(1.0, 1.0, 1.0); 

@@ -6,14 +6,22 @@
 class sphere : public hittable
 {
 public:
-	sphere(const point3& center, double radius, shared_ptr<material> mat) : center(center), radius(fmax(0.0, radius)), mat(mat) {}
+    // 静态球
+	sphere(const point3& center, double radius, shared_ptr<material> mat) : 
+        center(center, vec3(0.0, 0.0, 0.0)), radius(fmax(0.0, radius)), mat(mat) {}
+
+    // 动态球，在一段时间的开始与结束，有2个不同的位置
+    // 如果t == 0，球心在center1；如果时间t == 1，球心在center2。以此呈线性变化
+    sphere(const point3& center1, const point3& center2, double radius, shared_ptr<material> mat) : 
+        center(center1, center2 - center1), radius(fmax(0.0, radius)), mat(mat) {}
 
 	// 显示加override关键字的好处是，一是可读性好，二是编译器会当作重写函数来检查
 	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
 	{
+        point3 current_center = center.at(r.get_time());
         point3 o = r.origin();
         vec3 d = r.direction();
-        vec3 oc = center - o;
+        vec3 oc = current_center - o; // 根据ray的时刻算出球心位置
 
         // 转化为二项式求解未知数t的问题，推导过程参考referrence/sphere_hit.jpg
         // 简化过程参考referrence/quadratic_simplify.jpg
@@ -44,7 +52,7 @@ public:
             rec.p = r.at(t);
             // 1.注意这里并没用unit_vector方法计算outward_normal，这样可以减少sqrt运算，提升效率
             // 2.不需要normalize的地方就尽量不要normalize
-            vec3 outward_normal = (rec.p - center) / radius; 
+            vec3 outward_normal = (rec.p - current_center) / radius;
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
             rec.mat = mat;
@@ -55,7 +63,7 @@ public:
 	}
 
 private:
-	point3 center;  // 球心
+	ray center;  // 球心，以及可能的运动方向。方向的向量不能normalize，因为要用不同的向量长度来表现不同物体的不同速度
     double radius;  // 半径
     shared_ptr<material> mat; //材质
 };

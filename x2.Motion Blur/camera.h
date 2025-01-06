@@ -113,7 +113,9 @@ private:
                                   + ((j + offset.y()) * pixel_v);
         point3 ray_origin = (defocus_angle <= 0) ? cam_pos : defocus_disk_sample();
         vec3 ray_dir = pixel - ray_origin;
-        return ray(ray_origin, ray_dir);
+        double ray_time = random_double();
+
+        return ray(ray_origin, ray_dir, ray_time);
     }
 
     // 生成一个在xy方向上的随机偏移量，在-0.5,0.5之间 Z方向无偏移量

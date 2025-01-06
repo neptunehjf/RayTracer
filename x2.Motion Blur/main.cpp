@@ -45,7 +45,10 @@ int main()
                     // diffuse
                     color albedo = color::random() * color::random();
                     sphere_material = make_shared<diffuse>(albedo);
-                    scene.add(make_shared<sphere>(center, 0.2, sphere_material));
+
+                    // center2的位置反应了物体的运动速度
+                    point3 center2 = center + vec3(0, random_double(0, 0.5), 0);
+                    scene.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
                 }
                 else if (choose_mat < 0.95)
                 {
