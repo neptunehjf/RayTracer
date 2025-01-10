@@ -6,6 +6,7 @@
 #include <vector>
 #include <memory>
 #include <random>
+#include <time.h>
 
 // C++ Std Usings
 using namespace std;
