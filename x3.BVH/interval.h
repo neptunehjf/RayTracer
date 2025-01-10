@@ -25,6 +25,15 @@ public:
 			return x;
 	}
 
+	// ray与slab重合的场合，t_min和t_max都是NaN，所以(t_min <= t_max)的结果必为false
+	// 但是实际上这种情况也应该算是有交点(grazing angle)，所以稍微扩充一下AABB的大小，使(t_min <= t_max)的结果为true
+	// 具体参考 referrence/aabb.jpg
+	interval expand(double delta) const
+	{
+		double padding = delta / 2;
+		return interval(min - padding, max + padding);
+	}
+
 	// 声明和类相同类型的静态变量是合法的，不会导致递归定义
 	static const interval empty, universe;
 };
