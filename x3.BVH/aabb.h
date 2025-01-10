@@ -7,7 +7,7 @@
 class aabb
 {
 public:
-	// aabb的3对slab，与对应的坐标轴对齐(平行)
+	// aabb的3对slab，与对应的坐标轴对齐
 	interval x, y, z;
 
 	// 默认 空aabb
