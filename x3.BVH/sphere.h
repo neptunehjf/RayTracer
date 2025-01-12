@@ -8,12 +8,22 @@ class sphere : public hittable
 public:
     // 静态球
 	sphere(const point3& center, double radius, shared_ptr<material> mat) : 
-        center(center, vec3(0.0, 0.0, 0.0)), radius(fmax(0.0, radius)), mat(mat) {}
+        center(center, vec3(0.0, 0.0, 0.0)), radius(fmax(0.0, radius)), mat(mat) 
+    {
+        auto r = vec3(radius, radius, radius);
+        bbox = aabb(center - r, center + r);
+    }
 
     // 动态球，在一段时间的开始与结束，有2个不同的位置
     // 如果t == 0，球心在center1；如果时间t == 1，球心在center2。以此呈线性变化
     sphere(const point3& center1, const point3& center2, double radius, shared_ptr<material> mat) : 
-        center(center1, center2 - center1), radius(fmax(0.0, radius)), mat(mat) {}
+        center(center1, center2 - center1), radius(fmax(0.0, radius)), mat(mat) 
+    {
+        auto r = vec3(radius, radius, radius);
+        aabb bbox1(center.at(0.0) - r, center.at(0.0) + r);
+        aabb bbox2(center.at(1.0) - r, center.at(1.0) + r);
+        bbox = aabb(bbox1, bbox2);
+    }
 
 	// 显示加override关键字的好处是，一是可读性好，二是编译器会当作重写函数来检查
 	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
@@ -62,8 +72,14 @@ public:
         return false;
 	}
 
+    aabb bounding_box() const override
+    {
+        return bbox;
+    }
+
 private:
 	ray center;  // 球心，以及可能的运动方向。方向的向量不能normalize，因为要用不同的向量长度来表现不同物体的不同速度
     double radius;  // 半径
     shared_ptr<material> mat; //材质
+    aabb bbox; // aabb包围盒
 };

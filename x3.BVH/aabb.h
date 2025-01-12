@@ -10,7 +10,7 @@ public:
 	// aabb的3对slab，与对应的坐标轴对齐
 	interval x, y, z;
 
-	// 默认 空aabb
+	// 默认构造 空aabb  因为interval默认是空(inf, -inf)
 	aabb() {} 
 	
 	// 用interval直接构造aabb
@@ -23,6 +23,14 @@ public:
 		x = (a[0] <= b[0]) ? interval(a[0], b[0]) : interval(b[0], a[0]);
 		y = (a[1] <= b[1]) ? interval(a[1], b[1]) : interval(b[1], a[1]);
 		z = (a[2] <= b[2]) ? interval(a[2], b[2]) : interval(b[2], a[2]);
+	}
+
+	// 用2个包围盒构造1个包围盒
+	aabb(const aabb& bbox1, const aabb& bbox2)
+	{
+		x = interval(bbox1.x, bbox2.x);
+		y = interval(bbox1.y, bbox2.y);
+		z = interval(bbox1.z, bbox2.z);
 	}
 
 	const interval& get_interval_by_axis(int n) const

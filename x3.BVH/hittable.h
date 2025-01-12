@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "aabb.h"
 
 // 因为material.h已经包含了hittable.h，为了防止互相包含，这里用只声明的方式
 class material;
@@ -10,7 +11,7 @@ class hit_record
 public:
 	point3 p;
 	vec3 normal;
-	double t;
+	double t = 0.0;
 	shared_ptr<material> mat;
 
 	// 判断ray是从物体外部还是内部打过来的
@@ -45,4 +46,7 @@ public:
 
 	// 纯虚函数，具体放到子类实现
 	virtual bool hit(const ray& r, interval& ray_t, hit_record& rec) const = 0;
+
+	// 返回物体的包围盒
+	virtual aabb bounding_box() const = 0;
 };

@@ -17,7 +17,12 @@ public:
 	hittable_list() {}
 	hittable_list(shared_ptr<hittable> object) { add(object); }
 
-	void add(shared_ptr<hittable> object) { objects.push_back(object); }
+	void add(shared_ptr<hittable> object) 
+	{ 
+		objects.push_back(object);
+		bbox = aabb(bbox, object->bounding_box());
+	}
+
 	void clear() { objects.clear(); }
 
 	// override hittable
@@ -40,4 +45,12 @@ public:
 
 		return is_hit;
 	}
+
+	aabb bounding_box() const override
+	{
+		return bbox;
+	}
+
+private:
+	aabb bbox; // 默认构造 是空aabb，无需初始化
 };
