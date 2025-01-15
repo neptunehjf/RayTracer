@@ -45,7 +45,7 @@ public:
 	virtual ~hittable() = default;
 
 	// 纯虚函数，具体放到子类实现
-	virtual bool hit(const ray& r, interval& ray_t, hit_record& rec) const = 0;
+	virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
 
 	// 返回物体的包围盒
 	virtual aabb bounding_box() const = 0;

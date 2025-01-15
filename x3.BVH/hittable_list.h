@@ -26,7 +26,7 @@ public:
 	void clear() { objects.clear(); }
 
 	// override hittable
-	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
 		hit_record temp_rec;
 		bool is_hit = false;
@@ -37,7 +37,10 @@ public:
 		{
 			if (object->hit(r, ray_t, temp_rec))
 			{
-				ray_t.max = temp_rec.t;
+				// 因为ray_t改为值传递可以有更大的优化空间，此处的优化舍弃
+				// 而且在bvh结构中已经有类似的优化了，如果left节点 hit的话，对于right节点的ray.max也会更新为rec.t
+				// ray_t.max = temp_rec.t; 
+
 				rec = temp_rec;
 				is_hit = true;
 			}		

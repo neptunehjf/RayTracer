@@ -11,8 +11,8 @@ public:
 
 	interval(const interval& a, const interval& b)
 	{
-		min = std::min(a.min, a.max);
-		max = std::max(a.min, a.max);
+		min = std::min(a.min, b.min);
+		max = std::max(a.max, b.max);
 	}
 
 	double size() const { return max - min; }

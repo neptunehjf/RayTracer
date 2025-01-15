@@ -40,7 +40,13 @@ public:
 		return x;
 	}
 
-	bool hit(const ray& r, const interval& ray_t) const
+	//  调用次数多，需要重点优化
+	//  对于width 400 sample 100的渲染场景，实装后渲染时间由70秒优化到40秒左右，优化效果不是很明显，进一步研究发现，是因为在频繁调用的hit函数内部申请了两个变量来接收ray_t.min和ray_t.max的原因。用以下方式优化后的时间缩短为11秒。
+	//	优化：
+	//	1 hit内部不申请变量，而是把入参ray_t改为值传递，并直接修改ray_t的值，这是最重要的优化点
+	//	2 提前计算好倒数，后续乘倒数来实现除法
+	//	3 能加const修饰尽量加const
+	bool hit(const ray& r, interval ray_t) const
 	{
 		const point3& o = r.origin();
 		const vec3& d = r.direction();
@@ -51,8 +57,10 @@ public:
 			const interval& ax = get_interval_by_axis(axis);
 
 			// axis direction inverse，提前计算倒数以提高性能
-			double adinv = 1 / d[axis];
+			// 加const修饰符以提高性能
+			const double adinv = 1 / d[axis];
 
+			// slab与交点对应的t
 			double t0 = (ax.min - o[axis]) * adinv;
 			double t1 = (ax.max - o[axis]) * adinv;
 
@@ -60,14 +68,21 @@ public:
 			if (t0 > t1)
 				swap(t0, t1);
 
-			// ray与slab的interval(区间)求交集
-			double t_min, t_max;
-			t_min = max(t0, ax.min);
-			t_max = min(t1, ax.max);
+			// slab与ray的t求交集
+			
+			// 新申请两块内存，运行时间是36秒(width = 400 sample = 100)，效率较低
+			//const double t_min = max(t0, ray_t.min);
+			//const double t_max = min(t1, ray_t.max);
+
+			// 复用虚参ray_t的内存区域，运行时间是11秒(width = 400 sample = 100)，效率较高
+			// 缺点是虚参无法传值出去
+			ray_t.min = max(t0, ray_t.min);
+			ray_t.max = min(t1, ray_t.max);
 
 			// 如果交集的区间的min >= max，很显然不可能存在这样的交集，所以hit返回false
-			if (t_min >= t_max)
+			if (ray_t.min >= ray_t.max)
 				return false;
+
 		}
 		return true;
 	}

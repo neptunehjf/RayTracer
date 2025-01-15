@@ -3,6 +3,7 @@
 #include "sphere.h"
 #include "camera.h"
 #include "material.h"
+#include "bvh.h"
 
 int main() 
 {
@@ -82,6 +83,8 @@ int main()
     auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
     scene.add(make_shared<sphere>(point3(4.0, 1.0, 0.0), 1.0, material3));
 
+    scene = hittable_list(make_shared<bvh_node>(scene));
+
     // Render
     cam.render(scene);
 
@@ -89,6 +92,7 @@ int main()
     time(&end_time);
 
     clog << "elapsed time: " << difftime(end_time, start_time) << " seconds\n";
+    clog << "total bounce: " << total_bounce << endl;
     cin.get();
 
     return 0;

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "hittable_list.h"
 #include "material.h"
+#include "dbg.h"
 
 class camera
 {
@@ -32,30 +33,36 @@ public:
         for (int j = 0; j < image_height; j++)
         {
             // 显示进度
-            clog << "\rScanlines remaining: " << (image_height - j) << ' ' << flush;
+            clog << "\rScanlines remaining: " << (image_height - j) << ' ' 
+                 << " Unhit Count: " << unhit_count << " Hit Count: " 
+                 << hit_count << flush;
 
             for (int i = 0; i < image_width; i++)
             {
-                color pixel_color = vec3(0.0, 0.0, 0.0);
-
-                for (int n = 0; n < sample_num; n++)
+                //if (i + 1 == 115 && j + 1 == 168) // for debug
                 {
-                    // 求出每一个camera到像素中心附近的随机采样到的射线
-                    ray r = get_ray(i, j);
+                    color pixel_color = vec3(0.0, 0.0, 0.0);
 
-                    // 根据ray算出color，累加起来，最后除以采样数以达到平滑的效果
-                    pixel_color += ray_color(r, scene, 0);
+                    for (int n = 0; n < sample_num; n++)
+                    {
+                        // 求出每一个camera到像素中心附近的随机采样到的射线
+                        ray r = get_ray(i, j);
+
+                        // 根据ray算出color，累加起来，最后除以采样数以达到平滑的效果
+                        pixel_color += ray_color(r, scene, 0);
+                    }
+
+                    pixel_color /= sample_num;
+                    write_color(cout, pixel_color);
                 }
 
-                pixel_color /= sample_num;
-                write_color(cout, pixel_color);
             }
         }
         clog << "\rDone.                 \n";
 	}
 
 private:
-    int image_height;
+    int image_height = 10;
     point3 pixel_zero;
     vec3 pixel_u;
     vec3 pixel_v;
@@ -144,7 +151,10 @@ private:
             color attenuation;
 
             if (rec.mat->scatter(r, rec, attenuation, ray_out))
+            {
+                total_bounce++;
                 return attenuation * ray_color(ray_out, scene, ++bounce_count);
+            }  
 
             return color(0.0, 0.0, 0.0);
         }

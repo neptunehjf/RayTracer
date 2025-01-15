@@ -7,11 +7,11 @@ class sphere : public hittable
 {
 public:
     // 静态球
-	sphere(const point3& center, double radius, shared_ptr<material> mat) : 
-        center(center, vec3(0.0, 0.0, 0.0)), radius(fmax(0.0, radius)), mat(mat) 
+	sphere(const point3& center0, double radius, shared_ptr<material> mat) : 
+        center(center0, vec3(0.0, 0.0, 0.0)), radius(fmax(0.0, radius)), mat(mat) 
     {
         auto r = vec3(radius, radius, radius);
-        bbox = aabb(center - r, center + r);
+        bbox = aabb(center0 - r, center0 + r);
     }
 
     // 动态球，在一段时间的开始与结束，有2个不同的位置
@@ -26,7 +26,7 @@ public:
     }
 
 	// 显示加override关键字的好处是，一是可读性好，二是编译器会当作重写函数来检查
-	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
         point3 current_center = center.at(r.get_time());
         point3 o = r.origin();
