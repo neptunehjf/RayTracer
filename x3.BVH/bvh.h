@@ -16,7 +16,17 @@ public:
 
 	bvh_node(vector<shared_ptr<hittable>>& objects, size_t start, size_t end)
 	{
-		size_t axis = random_int(0, 2);
+		bbox = aabb::empty;
+
+		// 递归前算出总包围盒，再求出最长轴，用最长轴来划分物体。
+		// 对于width 800 sample 100 的场景，用最长轴划分法，耗时42秒，用随机轴划分法耗时45秒。而且可以看出最长轴划分法的unhit和hit次数都小于随机轴划分法，可见划分更合理。
+		for (size_t i = start; i < end; i++)
+		{
+			bbox = aabb(bbox, objects[i]->bounding_box());
+		}
+
+		// 因为最长轴上的物体分布更密集，更适合作为划分轴。比随机选取轴要更有效率
+		size_t axis = bbox.get_longest_axis();
 
 		auto comparator = (axis == 0) ? box_compare_x :
 					      (axis == 1) ? box_compare_y : box_compare_z;
@@ -39,7 +49,9 @@ public:
 			right = make_shared<bvh_node>(objects, mid, end);
 		}
 
-		bbox = aabb(left->bounding_box(), right->bounding_box());
+		// 因为要实现最长轴划分优化算法，总包围盒移到递归前计算
+		// bbox = aabb(left->bounding_box(), right->bounding_box());
+
 	}
 
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override

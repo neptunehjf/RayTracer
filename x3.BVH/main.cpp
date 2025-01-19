@@ -15,7 +15,7 @@ int main()
     // Camera
     camera cam;
     cam.aspect_radio = 16.0 / 9.0;
-    cam.image_width = 400;
+    cam.image_width = 800;
     cam.sample_num = 100;
     cam.bounce_limit = 50;
 

@@ -35,6 +35,7 @@ public:
 
 	const interval& get_interval_by_axis(int n) const
 	{
+		// x0 y1 z2
 		if (n == 1) return y;
 		if (n == 2) return z;
 		return x;
@@ -87,4 +88,19 @@ public:
 		return true;
 	}
 
+	int get_longest_axis() const
+	{
+		// x0 y1 z2
+		if (x.size() > y.size() && x.size() > z.size()) return 0;
+			
+		if (y.size() > x.size() && y.size() > z.size()) return 1;
+
+		if (z.size() > x.size() && z.size() > y.size()) return 2;
+	}
+
+	// 声明和类相同类型的静态变量是合法的，不会导致递归定义
+	static const aabb empty, universe;
 };
+
+const aabb aabb::empty = aabb(interval::empty, interval::empty, interval::empty);
+const aabb aabb::universe = aabb(interval::universe, interval::universe, interval::universe);
