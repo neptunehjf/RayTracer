@@ -66,6 +66,7 @@ public:
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
             rec.mat = mat;
+            get_sphere_uv(rec.p, rec.u, rec.v);
             return true;
         }
             
@@ -82,4 +83,16 @@ private:
     double radius;  // 半径
     shared_ptr<material> mat; //材质
     aabb bbox; // aabb包围盒
+
+    static void get_sphere_uv(const point3& p, double& u, double v)
+    {
+        // 对于以原点为球心，半径为1的球体
+        // 笛卡尔坐标 =》球面坐标 参照 referrence/cartesian_to_spherical.jpg
+        double theta = acos(-p.y());
+        double phi = atan2(-p.z(), p.x()) + pi;
+
+        // 球面坐标 =》UV坐标
+        u = phi / (2 * pi);
+        v = theta / pi;
+    }
 };
