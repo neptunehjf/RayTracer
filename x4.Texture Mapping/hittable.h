@@ -13,6 +13,8 @@ public:
 	vec3 normal;
 	double t = 0.0;
 	shared_ptr<material> mat;
+	double u;
+	double v;
 
 	// 判断ray是从物体外部还是内部打过来的
 	// 当前情况下，在几何阶段做判断结果并存储可能是一种比较高效的选择

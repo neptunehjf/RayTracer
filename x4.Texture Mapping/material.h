@@ -1,6 +1,7 @@
 #pragma once
 
 #include "hittable.h"
+#include "texture.h"
 
 class material
 {
@@ -22,7 +23,8 @@ public:
 class diffuse : public material
 {
 public:
-	diffuse(const color& albedo) : albedo(albedo) {}
+	diffuse(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
+	diffuse(shared_ptr<texture> tex) : tex(tex) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
 		color& attenuation, ray& ray_out) const override
@@ -37,13 +39,13 @@ public:
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
 		ray_out = ray(rec.p, out_dir, ray_in.get_time());
-		attenuation = albedo;
+		attenuation = tex->get_value(rec.u, rec.v, rec.p);
 
 		return true;
 	}
 
 private:
-	color albedo;
+	shared_ptr<texture> tex;
 };
 
 class metal : public material
