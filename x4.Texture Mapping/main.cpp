@@ -6,13 +6,8 @@
 #include "bvh.h"
 #include "texture.h"
 
-int main() 
+void scene_bouncing_spheres() 
 {
-    time_t start_time, end_time;
-
-    // 开始计时
-    time(&start_time);
-
     // Camera
     camera cam;
     cam.aspect_radio = 16.0 / 9.0;
@@ -89,6 +84,57 @@ int main()
 
     // Render
     cam.render(scene);
+}
+
+void scene_checkered_spheres() 
+{
+    // Camera
+    camera cam;
+
+    cam.aspect_radio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.sample_num = 100;
+    cam.bounce_limit = 50;
+
+    cam.vfov = 20;
+    cam.look_from = point3(13, 2, 3);
+    cam.look_at = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    // scene
+    hittable_list scene;
+
+    auto checker = make_shared<checker_texture>(2.0, color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+
+    scene.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<diffuse>(checker)));
+    scene.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<diffuse>(checker)));
+
+    // 对于物体数极少的情况，用aabb包围盒优化算法反而效率更低
+    //scene = hittable_list(make_shared<bvh_node>(scene));
+
+    cam.render(scene);
+}
+
+int main()
+{
+    time_t start_time, end_time;
+
+    // 开始计时
+    time(&start_time);
+
+    switch (2)
+    {
+    case 1:
+        scene_bouncing_spheres();
+        break;
+    case 2:
+        scene_checkered_spheres();
+        break;
+    default:
+        break;
+    }
 
     // 结束计时
     time(&end_time);
