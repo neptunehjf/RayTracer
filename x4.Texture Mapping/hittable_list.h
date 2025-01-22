@@ -28,20 +28,20 @@ public:
 	// override hittable
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
-		hit_record temp_rec;
+		// hit_record temp_rec;
 		bool is_hit = false;
 
 		// 对于一组hittable对象，只需找到最近的交点
 		// 因此用上次循环中找到的最近的t值 动态修改判定范围的最大值,效率比较高
 		for (const auto& object : objects)
 		{
-			if (object->hit(r, ray_t, temp_rec))
+			if (object->hit(r, ray_t, rec))
 			{
 				// 因为ray_t改为值传递可以有更大的优化空间，此处的优化舍弃
 				// 而且在bvh结构中已经有类似的优化了，如果left节点 hit的话，对于right节点的ray.max也会更新为rec.t
 				// ray_t.max = temp_rec.t; 
 
-				rec = temp_rec;
+				//rec = temp_rec;
 				is_hit = true;
 			}		
 		}
