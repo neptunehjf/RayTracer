@@ -66,7 +66,10 @@ public:
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
             rec.mat = mat;
-            get_sphere_uv(rec.p, rec.u, rec.v);
+
+            // 前提是以原点为球心，半径为1的球体，因此入参应该是outward_normal而不是rec.p
+            // outward_normal是相对于球心的一个单位向量，因此也可以看作是以原点为球心的半径为1的位置，符合uv的计算前提
+            get_sphere_uv(outward_normal, rec.u, rec.v);
             return true;
         }
             
@@ -84,9 +87,9 @@ private:
     shared_ptr<material> mat; //材质
     aabb bbox; // aabb包围盒
 
-    static void get_sphere_uv(const point3& p, double& u, double v)
+    static void get_sphere_uv(const point3& p, double& u, double& v)
     {
-        // 对于以原点为球心，半径为1的球体
+        // 前提是以原点为球心，半径为1的球体
         // 笛卡尔坐标 =》球面坐标 参照 referrence/cartesian_to_spherical.jpg
         double theta = acos(-p.y());
         double phi = atan2(-p.z(), p.x()) + pi;

@@ -8,26 +8,11 @@
 
 void scene_bouncing_spheres() 
 {
-    // Camera
-    camera cam;
-    cam.aspect_radio = 16.0 / 9.0;
-    cam.image_width = 400;
-    cam.sample_num = 100;
-    cam.bounce_limit = 50;
-
-    cam.vfov = 20.0;
-    cam.look_from = point3(13.0, 2.0, 3.0);
-    cam.look_at = point3(0.0, 0.0, 0.0);
-    cam.vup = vec3(0.0, 1.0, 0.0);
-
-    cam.defocus_angle = 0.6;
-    cam.focus_dist = 10.0;
-
     // Scene
     hittable_list scene;
 
-    auto checker = make_shared<checker_texture>(1.0, color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
-    auto ground_material = make_shared<diffuse>(checker);
+    auto checker_tex = make_shared<checker_texture>(2.0, color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+    auto ground_material = make_shared<diffuse>(checker_tex);
     scene.add(make_shared<sphere>(point3(0.0, -1000.0, 0.0), 1000.0, ground_material));
 
     for (int a = -11; a < 11; a++) 
@@ -82,12 +67,38 @@ void scene_bouncing_spheres()
 
     scene = hittable_list(make_shared<bvh_node>(scene));
 
+    // Camera
+    camera cam;
+    cam.aspect_radio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.sample_num = 100;
+    cam.bounce_limit = 50;
+
+    cam.vfov = 20.0;
+    cam.look_from = point3(13.0, 2.0, 3.0);
+    cam.look_at = point3(0.0, 0.0, 0.0);
+    cam.vup = vec3(0.0, 1.0, 0.0);
+
+    cam.defocus_angle = 0.6;
+    cam.focus_dist = 10.0;
+
     // Render
     cam.render(scene);
 }
 
 void scene_checkered_spheres() 
 {
+    // scene
+    hittable_list scene;
+
+    auto checker_tex = make_shared<checker_texture>(2.0, color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+
+    scene.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<diffuse>(checker_tex)));
+    scene.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<diffuse>(checker_tex)));
+
+    // 对于物体数极少的情况，用aabb包围盒优化算法反而效率更低
+    //scene = hittable_list(make_shared<bvh_node>(scene));
+
     // Camera
     camera cam;
 
@@ -103,17 +114,37 @@ void scene_checkered_spheres()
 
     cam.defocus_angle = 0;
 
-    // scene
+    // render
+    cam.render(scene);
+}
+
+void scene_earth()
+{
+    // Scene
     hittable_list scene;
 
-    auto checker = make_shared<checker_texture>(2.0, color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+    auto earth_tex = make_shared<image_texture>("earthmap.jpg");
+    auto earth_material = make_shared<diffuse>(earth_tex);
+    auto globe = make_shared<sphere>(point3(0, 0, 0), 2, earth_material);
 
-    scene.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<diffuse>(checker)));
-    scene.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<diffuse>(checker)));
+    scene.add(globe);
 
-    // 对于物体数极少的情况，用aabb包围盒优化算法反而效率更低
-    //scene = hittable_list(make_shared<bvh_node>(scene));
+    // Camera
+    camera cam;
 
+    cam.aspect_radio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.sample_num = 100;
+    cam.bounce_limit = 50;
+
+    cam.vfov = 20;
+    cam.look_from = point3(0, 0, 12);
+    cam.look_at = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    // Render
     cam.render(scene);
 }
 
@@ -124,7 +155,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (2)
+    switch (3)
     {
     case 1:
         scene_bouncing_spheres();
@@ -132,6 +163,8 @@ int main()
     case 2:
         scene_checkered_spheres();
         break;
+    case 3:
+        scene_earth();
     default:
         break;
     }
