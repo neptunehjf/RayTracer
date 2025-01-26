@@ -148,6 +148,34 @@ void scene_earth()
     cam.render(scene);
 }
 
+void scene_perlin_spheres() 
+{
+    // Scene
+    hittable_list scene;
+
+    auto perlin_tex = make_shared<noise_texture>();
+    scene.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<diffuse>(perlin_tex)));
+    scene.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<diffuse>(perlin_tex)));
+
+    // Camera
+    camera cam;
+
+    cam.aspect_radio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.sample_num = 100;
+    cam.bounce_limit = 50;
+
+    cam.vfov = 20;
+    cam.look_from = point3(13, 2, 3);
+    cam.look_at = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    // Render
+    cam.render(scene);
+}
+
 int main()
 {
     time_t start_time, end_time;
@@ -155,7 +183,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (3)
+    switch (4)
     {
     case 1:
         scene_bouncing_spheres();
@@ -165,6 +193,8 @@ int main()
         break;
     case 3:
         scene_earth();
+    case 4:
+        scene_perlin_spheres();
     default:
         break;
     }

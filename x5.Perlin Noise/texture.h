@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "rtw_stb_image.h"
+#include "perlin.h"
 
 class texture
 {
@@ -90,4 +91,19 @@ public:
 
 private:
 	rtw_image image;
+};
+
+class noise_texture : public texture
+{
+public:
+	// perlin用默认构造体构造，不需要参数
+	noise_texture() {}
+
+	color get_value(double u, double v, const point3& p) const
+	{
+		return color(1.0, 1.0, 1.0) * noise.noise(p);
+	}
+
+private:
+	perlin noise;
 };
