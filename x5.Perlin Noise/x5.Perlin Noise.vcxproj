@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{64fa401e-500c-43bc-a725-a05b14653dfb}</ProjectGuid>
-    <RootNamespace>x4TextureMapping</RootNamespace>
+    <ProjectGuid>{d63cf899-657c-4584-b6b4-6d667a6afb96}</ProjectGuid>
+    <RootNamespace>x5PerlinNoise</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>..\Dependency\Includes\stb;$(IncludePath)</IncludePath>
+    <ExecutablePath>..\Dependency\Includes\stb;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\Dependency\Includes\stb;$(IncludePath)</IncludePath>
+    <ExecutablePath>..\Dependency\Includes\stb;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
