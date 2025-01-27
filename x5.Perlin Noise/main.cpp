@@ -153,7 +153,7 @@ void scene_perlin_spheres()
     // Scene
     hittable_list scene;
 
-    auto perlin_tex = make_shared<noise_texture>();
+    auto perlin_tex = make_shared<noise_texture>(4);
     scene.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<diffuse>(perlin_tex)));
     scene.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<diffuse>(perlin_tex)));
 

@@ -97,13 +97,14 @@ class noise_texture : public texture
 {
 public:
 	// perlin用默认构造体构造，不需要参数
-	noise_texture() {}
+	noise_texture(double frenquency) : frenquency(frenquency) {}
 
 	color get_value(double u, double v, const point3& p) const
 	{
-		return color(1.0, 1.0, 1.0) * noise.noise(p);
+		return color(1.0, 1.0, 1.0) * noise.noise(frenquency * p);
 	}
 
 private:
 	perlin noise;
+	double frenquency;
 };
