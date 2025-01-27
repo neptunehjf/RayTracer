@@ -28,6 +28,13 @@ public:
 		double v = p.y() - floor(p.y());
 		double w = p.z() - floor(p.z());
 
+		// Hermitian Smoothing 减轻马克纹
+		// Hermite曲线在0和1处导数为0，且导数是一直变化的，因此相比线性函数更平滑，因此渲染效果更自然
+		// 参照referrence/Hermite curve.png
+		u = u * u * (3 - 2 * u); // 比直接3 * u * u - 2 * u * u * u 效率高
+		v = v * v * (3 - 2 * v);
+		w = w * w * (3 - 2 * w);
+
 		int i = (int)floor(p.x());
 		int j = (int)floor(p.y());
 		int k = (int)floor(p.z());
