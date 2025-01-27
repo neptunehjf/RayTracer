@@ -18,17 +18,34 @@ public:
 	}
 
 	// 基于位置计算的噪声
+	// 把空间划分成一个个的立方体，每个立方体都有一个索引，在每个立方体内部，都有8个顶点
+	// 通过计算点相对于这8个顶点的位置进行插值，相对于顶点的插值与离顶点的距离成反比
+	// 参照 referrence/Perlin Trilinear Interpolation.jpg
 	double noise(const point3& p) const
 	{
-		// 4是噪声变化的频率，暂时设为4
 		// &255是想clamp值在0~255之间，bitwise&操作应该会比clamp操作效率更高
-		int i = int(4 * p.x()) & 255; 
-		int j = int(4 * p.y()) & 255;
-		int k = int(4 * p.z()) & 255;
+		double u = p.x() - floor(p.x());
+		double v = p.y() - floor(p.y());
+		double w = p.z() - floor(p.z());
 
-		// 使用异或而不是加法，乘法混合，是因为加法，乘法是线性运算，会产生可见的模式；并且加法乘法的效率低于异或运算
-		// 综上，使用异或混合是更优的选择
-		return randfloat[perm_x[i] ^ perm_y[j] ^ perm_z[k]];
+		int i = (int)floor(p.x());
+		int j = (int)floor(p.y());
+		int k = (int)floor(p.z());
+
+		double c[2][2][2] = {};
+
+		for (int di = 0; di < 2; di++)
+			for (int dj = 0; dj < 2; dj++)
+				for (int dk = 0; dk < 2; dk++)
+				{
+					// 使用异或而不是加法，乘法混合，是因为加法，乘法是线性运算，会产生可见的模式；并且加法乘法的效率低于异或运算
+                    // 综上，使用异或混合是更优的选择
+					c[di][dj][dk] = randfloat[perm_x[(i + di) & 255] 
+						                    ^ perm_y[(j + dj) & 255]
+						                    ^ perm_z[(k + dk) & 255]];
+				}
+
+		return trilinear_interpolation(c, u, v, w);
 	}
 
 
@@ -61,5 +78,23 @@ private:
 			p[i] = p[ri];
 			p[ri] = tmp;
 		}
+	}
+
+	// 三线性插值 
+	// 参照 referrence/Perlin Trilinear Interpolation.jpg
+	static double trilinear_interpolation(double c[2][2][2], double u, double v, double w)
+	{
+		double accum = 0.0;
+
+		for (int i = 0; i < 2; i++)
+			for (int j = 0; j < 2; j++)
+				for (int k = 0; k < 2; k++)
+				{
+					accum += (c[i][j][k] * (i * u + (1 - i) * (1 - u))
+						                 * (j * v + (1 - j) * (1 - v))
+						                 * (k * w + (1 - k) * (1 - w)));
+				}
+
+		return accum;
 	}
 };
