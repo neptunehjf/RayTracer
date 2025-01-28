@@ -55,6 +55,24 @@ public:
 		return perlin_interpolation(c, u, v, w);
 	}
 
+	// 用湍流模拟自然界的多尺度现象，可以用于模拟自然界中的材质
+	// 参照 referrence/Turbulence.png
+	double turbulence(const point3& p, int depth) const
+	{
+		double amplitude = 1.0;
+		double frequency = 1.0;
+		double noise_sum = 0.0;
+		
+		for (int i = 0; i < depth; i++)
+		{
+			noise_sum += amplitude * noise(frequency * p);
+			amplitude *= 0.5;
+			frequency *= 2;
+		}
+		
+		return fabs(noise_sum);
+	}
+
 
 private:
 	static const int point_count = 256;
