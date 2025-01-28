@@ -106,7 +106,11 @@ public:
 
 
 		// 湍流 叠加7层
-		return color(1.0, 1.0, 1.0) * noise.turbulence(p, 7);
+		//return color(1.0, 1.0, 1.0) * noise.turbulence(p, 7);
+
+		// 生成大理石材质
+		// 初始值是1.0白色，用sin波形生成图案，z轴坐标作为自变量，再加上湍流的偏移
+		return color(0.5, 0.5, 0.5) * (1.0 + sin(frenquency * p.z() + 10 * noise.turbulence(p, 7)));
 	}
 
 private:
