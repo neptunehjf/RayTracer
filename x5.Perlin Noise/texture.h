@@ -101,7 +101,8 @@ public:
 
 	color get_value(double u, double v, const point3& p) const
 	{
-		return color(1.0, 1.0, 1.0) * noise.noise(frenquency * p);
+		// noise [-1, 1] => [0, 1]
+		return color(1.0, 1.0, 1.0) * 0.5 * (1.0 + noise.noise(frenquency * p));
 	}
 
 private:

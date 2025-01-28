@@ -9,9 +9,9 @@ public:
 	{
 		for (int i = 0; i < point_count; i++)
 		{
-			randfloat[i] = random_double();
+			randvec[i] = unit_vector(vec3::random(-1.0, 1.0));
 		}
-		#include "perlin.h"
+
 		generate_perm(perm_x);
 		generate_perm(perm_y);
 		generate_perm(perm_z);
@@ -39,7 +39,7 @@ public:
 		int j = (int)floor(p.y());
 		int k = (int)floor(p.z());
 
-		double c[2][2][2] = {};
+		vec3 c[2][2][2] = {};
 
 		for (int di = 0; di < 2; di++)
 			for (int dj = 0; dj < 2; dj++)
@@ -47,18 +47,18 @@ public:
 				{
 					// 使用异或而不是加法，乘法混合，是因为加法，乘法是线性运算，会产生可见的模式；并且加法乘法的效率低于异或运算
                     // 综上，使用异或混合是更优的选择
-					c[di][dj][dk] = randfloat[perm_x[(i + di) & 255] 
-						                    ^ perm_y[(j + dj) & 255]
-						                    ^ perm_z[(k + dk) & 255]];
+					c[di][dj][dk] = randvec[perm_x[(i + di) & 255] 
+						                  ^ perm_y[(j + dj) & 255]
+						                  ^ perm_z[(k + dk) & 255]];
 				}
 
-		return trilinear_interpolation(c, u, v, w);
+		return perlin_interpolation(c, u, v, w);
 	}
 
 
 private:
 	static const int point_count = 256;
-	double randfloat[point_count];
+	vec3 randvec[point_count];
 	int perm_x[point_count];
 	int perm_y[point_count];
 	int perm_z[point_count];
@@ -87,9 +87,7 @@ private:
 		}
 	}
 
-	// 三线性插值 
-	// 参照 referrence/Perlin Trilinear Interpolation.jpg
-	static double trilinear_interpolation(double c[2][2][2], double u, double v, double w)
+	static double perlin_interpolation(vec3 c[2][2][2], double u, double v, double w)
 	{
 		double accum = 0.0;
 
@@ -97,9 +95,18 @@ private:
 			for (int j = 0; j < 2; j++)
 				for (int k = 0; k < 2; k++)
 				{
-					accum += (c[i][j][k] * (i * u + (1 - i) * (1 - u))
-						                 * (j * v + (1 - j) * (1 - v))
-						                 * (k * w + (1 - k) * (1 - w)));
+					// 顶点指向点p的向量，用于和梯度向量求点积
+					vec3 weight_v = vec3(u - i, v - j, w - k);
+
+					// 如果只用简单的随机数来插值，MIN和MAX的值一定会落在顶点上，会导致生成块状图案
+					// 用梯度向量与weight_v的点积代替简单的随机数
+					// 因为点积可正可负，所以在插值方向上的导数也可正可负
+					// 这样一来MIN和MAX值就不一定落在顶点上了，生成的图案更自然
+					// 参照 referrence/Perlin Gradient Vector.jpg
+					accum += (dot(c[i][j][k], weight_v) 
+						    * (i * u + (1 - i) * (1 - u))
+						    * (j * v + (1 - j) * (1 - v))
+						    * (k * w + (1 - k) * (1 - w)));
 				}
 
 		return accum;
