@@ -15,7 +15,10 @@ public:
 	
 	// 用interval直接构造aabb
 	aabb(const interval& x, const interval& y, const interval& z) :
-		x(x), y(y), z(z) {}
+		x(x), y(y), z(z) 
+	{
+
+	}
 
 	// 用两个点间接构造aabb，入参只需提供数据，不需要排序
 	aabb(const point3& a, const point3& b)
@@ -61,6 +64,10 @@ public:
 			// 加const修饰符以提高性能
 			const double adinv = 1 / d[axis];
 
+			// 参照referrence/aabb.jpg 的特殊情况3，grazing angle的hit结果应该视为true而不是false，因此需要padding
+			if ((ax.min - o[axis] == 0 || ax.max - o[axis] == 0) && (d[axis] == 0))
+				ax.expand(0.0001);
+
 			// slab与交点对应的t
 			double t0 = (ax.min - o[axis]) * adinv;
 			double t1 = (ax.max - o[axis]) * adinv;
@@ -98,9 +105,20 @@ public:
 		if (z.size() > x.size() && z.size() > y.size()) return 2;
 	}
 
-	// 声明和类相同类型的静态变量是合法的，不会导致递归定义
+	// <声明>和类相同类型的静态变量是合法的，<声明>不会分配内存，因此不会导致递归定义
 	static const aabb empty, universe;
+
+	private:
+		void padding_box()
+		{
+			// 填充面图元，防止出现数学错误(除以0之类的)
+			double delta = 0.0001;
+			if (x.size() < delta) x = x.expand(delta);
+			if (y.size() < delta) y = y.expand(delta);
+			if (z.size() < delta) z = z.expand(delta);
+		}
 };
 
+// <定义>和类相同类型的静态变量是在类外部进行的，在此处会分配内存
 const aabb aabb::empty = aabb(interval::empty, interval::empty, interval::empty);
 const aabb aabb::universe = aabb(interval::universe, interval::universe, interval::universe);
