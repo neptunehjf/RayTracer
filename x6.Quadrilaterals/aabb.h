@@ -113,9 +113,9 @@ public:
 		{
 			// 填充面图元，防止出现数学错误(除以0之类的)
 			double delta = 0.0001;
-			if (x.size() < delta) x = x.expand(delta);
-			if (y.size() < delta) y = y.expand(delta);
-			if (z.size() < delta) z = z.expand(delta);
+			if (x.size() < 1e-8) x = x.expand(delta);
+			if (y.size() < 1e-8) y = y.expand(delta);
+			if (z.size() < 1e-8) z = z.expand(delta);
 		}
 };
 

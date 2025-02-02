@@ -32,7 +32,7 @@ public:
 	}
 
 	// ray与slab重合的场合，t_min和t_max都是NaN，所以(t_min <= t_max)的结果必为false
-	// 但是实际上这种情况也应该算是有交点(grazing angle)，所以稍微扩充一下AABB的大小，使(t_min <= t_max)的结果为true
+	// 但是实际上这种情况也应该算是有交点(对于是球体的情况 grazing angle)，所以稍微扩充一下AABB的大小，使(t_min <= t_max)的结果为true
 	// 具体参考 referrence/aabb.jpg 特殊情况3
 	// 
 	// 另一种情况是图元为面的情况，这时候没有体积，就需要扩充，否则可能会有数学错误
