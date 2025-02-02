@@ -5,6 +5,7 @@
 #include "material.h"
 #include "bvh.h"
 #include "texture.h"
+#include "quad.h"
 
 void scene_bouncing_spheres() 
 {
@@ -176,6 +177,42 @@ void scene_perlin_spheres()
     cam.render(scene);
 }
 
+void scene_quads() 
+{
+    // Scene
+    hittable_list scene;
+
+    // Materials
+    auto left_red = make_shared<diffuse>(color(1.0, 0.2, 0.2));
+    auto back_green = make_shared<diffuse>(color(0.2, 1.0, 0.2));
+    auto right_blue = make_shared<diffuse>(color(0.2, 0.2, 1.0));
+    auto upper_orange = make_shared<diffuse>(color(1.0, 0.5, 0.0));
+    auto lower_teal = make_shared<diffuse>(color(0.2, 0.8, 0.8));
+
+    // Quads
+    scene.add(make_shared<quad>(point3(-3, -2, 5), vec3(0, 0, -4), vec3(0, 4, 0), left_red));
+    scene.add(make_shared<quad>(point3(-2, -2, 0), vec3(4, 0, 0), vec3(0, 4, 0), back_green));
+    scene.add(make_shared<quad>(point3(3, -2, 1), vec3(0, 0, 4), vec3(0, 4, 0), right_blue));
+    scene.add(make_shared<quad>(point3(-2, 3, 1), vec3(4, 0, 0), vec3(0, 0, 4), upper_orange));
+    scene.add(make_shared<quad>(point3(-2, -3, 5), vec3(4, 0, 0), vec3(0, 0, -4), lower_teal));
+
+    camera cam;
+
+    cam.aspect_radio = 1.0;
+    cam.image_width = 400;
+    cam.sample_num = 100;
+    cam.bounce_limit = 50;
+
+    cam.vfov = 80;
+    cam.look_from = point3(0, 0, 9);
+    cam.look_at = point3(0, 0, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(scene);
+}
+
 int main()
 {
     time_t start_time, end_time;
@@ -183,7 +220,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (4)
+    switch (5)
     {
     case 1:
         scene_bouncing_spheres();
@@ -193,8 +230,13 @@ int main()
         break;
     case 3:
         scene_earth();
+        break;
     case 4:
         scene_perlin_spheres();
+        break;
+    case 5:
+        scene_quads();
+        break;
     default:
         break;
     }
