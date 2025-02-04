@@ -18,6 +18,13 @@ public:
 	{
 		return false;
 	}
+
+	// 光源材质，默认不发光(黑色)
+	// 纯色光源一般用不到参数u,v,p，要实现一些特殊效果(比如带贴图的光源)的话可能会用到
+	virtual color emit(double u, double v, const point3& p) const
+	{
+		return color(0, 0, 0);
+	}
 };
 
 class diffuse : public material
@@ -125,4 +132,19 @@ private:
 		r0 = r0 * r0;
 		return r0 + (1 - r0) * pow((1 - cos_theta), 5);
 	}
+};
+
+class diffuse_light : public material
+{
+public:
+	diffuse_light(const color& light_color) : tex(make_shared<solid_color>(light_color)) {}
+	diffuse_light(shared_ptr<texture> tex) : tex(tex) {}
+
+	color emit(double u, double v, const point3& p) const override
+	{
+		return tex->get_value(u, v, p);
+	}
+
+private:
+	shared_ptr<texture> tex;
 };

@@ -83,6 +83,8 @@ void scene_bouncing_spheres()
     cam.defocus_angle = 0.6;
     cam.focus_dist = 10.0;
 
+    cam.background = color(0.70, 0.80, 1.00);
+
     // Render
     cam.render(scene);
 }
@@ -115,6 +117,8 @@ void scene_checkered_spheres()
 
     cam.defocus_angle = 0;
 
+    cam.background = color(0.70, 0.80, 1.00);
+
     // render
     cam.render(scene);
 }
@@ -145,6 +149,8 @@ void scene_earth()
 
     cam.defocus_angle = 0;
 
+    cam.background = color(0.70, 0.80, 1.00);
+
     // Render
     cam.render(scene);
 }
@@ -172,6 +178,8 @@ void scene_perlin_spheres()
     cam.vup = vec3(0, 1, 0);
 
     cam.defocus_angle = 0;
+
+    cam.background = color(0.70, 0.80, 1.00);
 
     // Render
     cam.render(scene);
@@ -210,6 +218,71 @@ void scene_quads()
 
     cam.defocus_angle = 0;
 
+    cam.background = color(0.70, 0.80, 1.00);
+
+    cam.render(scene);
+}
+
+void scene_simple_light() 
+{
+    hittable_list scene;
+
+    auto pertext = make_shared<noise_texture>(4);
+    scene.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<diffuse>(pertext)));
+    scene.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<diffuse>(pertext)));
+
+    auto difflight = make_shared<diffuse_light>(color(4, 4, 4));
+    scene.add(make_shared<quad>(point3(3, 1, -2), vec3(2, 0, 0), vec3(0, 2, 0), difflight));
+
+    camera cam;
+
+    cam.aspect_radio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.sample_num = 100;
+    cam.bounce_limit = 50;
+    cam.background = color(0, 0, 0);
+
+    cam.vfov = 20;
+    cam.look_from = point3(26, 3, 6);
+    cam.look_at = point3(0, 2, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(scene);
+}
+
+void scene_cornell_box() 
+{
+    hittable_list scene;
+
+    auto red = make_shared<diffuse>(color(.65, .05, .05));
+    auto white = make_shared<diffuse>(color(.73, .73, .73));
+    auto green = make_shared<diffuse>(color(.12, .45, .15));
+    auto light = make_shared<diffuse_light>(color(15, 15, 15));
+
+    scene.add(make_shared<quad>(point3(555, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), green));
+    scene.add(make_shared<quad>(point3(0, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), red));
+    scene.add(make_shared<quad>(point3(343, 554, 332), vec3(-130, 0, 0), vec3(0, 0, -105), light));
+    scene.add(make_shared<quad>(point3(0, 0, 0), vec3(555, 0, 0), vec3(0, 0, 555), white));
+    scene.add(make_shared<quad>(point3(555, 555, 555), vec3(-555, 0, 0), vec3(0, 0, -555), white));
+    scene.add(make_shared<quad>(point3(0, 0, 555), vec3(555, 0, 0), vec3(0, 555, 0), white));
+
+    camera cam;
+
+    cam.aspect_radio = 1.0;
+    cam.image_width = 600;
+    cam.sample_num = 200;
+    cam.bounce_limit = 50;
+    cam.background = color(0, 0, 0);
+
+    cam.vfov = 40;
+    cam.look_from = point3(278, 278, -800);
+    cam.look_at = point3(278, 278, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
     cam.render(scene);
 }
 
@@ -220,7 +293,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (5)
+    switch (7)
     {
     case 1:
         scene_bouncing_spheres();
@@ -236,6 +309,12 @@ int main()
         break;
     case 5:
         scene_quads();
+        break;
+    case 6:
+        scene_simple_light();
+        break;
+    case 7:
+        scene_cornell_box();
         break;
     default:
         break;

@@ -23,6 +23,8 @@ public:
     double defocus_angle = 0.0;    // 角度，和焦距一起决定了透镜的大小
     double focus_dist = 10.0;      // 完美成像的焦距
 
+    color  background; // 场景背景色
+
     // 光追的渲染是和camera绑定的，因此把render放到camera类里
 	void render(const hittable_list& scene)
 	{
@@ -150,23 +152,33 @@ private:
             ray ray_out;
             color attenuation;
 
+            // 以下分支，光源材质和弹射材质是互斥的，因此逻辑简单清晰。
+            // 以后有可能会同时支持两种特性的材质，暂时先放着吧
+            // 
+            // 可以看到光追优于光栅化的地方。光追的光源衰减，是通过弹射自然算出的
+            // 光栅化无法自然做到，只能额外用公式来模拟光源衰减
+            // 
+            // 如果当前交点有弹射，说明是非光源材质，非光源材质只需返回弹射颜色
             if (rec.mat->scatter(r, rec, attenuation, ray_out))
             {
                 total_bounce++;
                 return attenuation * ray_color(ray_out, scene, ++bounce_count);
-            }  
-
-            return color(0.0, 0.0, 0.0);
+            }
+            // 如果当前交点在光源材质，则只需返回光源颜色
+            else
+                return rec.mat->emit(rec.u, rec.v, rec.p);
         }
 
-        // 以下为背景色
+        // 什么都没击中，返回背景色
+        return background;
         // 根据r的y分量进行lerp
-        vec3 r_uint = unit_vector(r.direction());
-        // [-1.0, 1.0] ==> [0.0, 1.0]
-        double a = 0.5 * (r_uint.y() + 1.0);
+        //vec3 r_uint = unit_vector(r.direction());
+        //// [-1.0, 1.0] ==> [0.0, 1.0]
+        //double a = 0.5 * (r_uint.y() + 1.0);
 
-        // 返回蓝色与白色之间的lerp
-        return (1 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
+        //// 返回蓝色与白色之间的lerp
+        //return (1 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
+        
     }
 
     point3 defocus_disk_sample() const 
