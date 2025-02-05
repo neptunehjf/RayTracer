@@ -70,7 +70,7 @@ public:
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
 		// 物体移动了offset ,相当于camera(光线)移动-offset
-		ray offset_r(r.origin() + offset, r.direction(), r.time());
+		ray offset_r(r.origin() - offset, r.direction(), r.time());
 
 		// 用移动后的光线与未移动的物体进行hit判断
 		if (object->hit(offset_r, ray_t, rec))

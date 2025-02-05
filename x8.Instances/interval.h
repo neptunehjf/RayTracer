@@ -50,12 +50,12 @@ public:
 const interval interval::empty = interval(inf, -inf);
 const interval interval::universe = interval(-inf, inf);
 
-interval operator+(const interval& itv, double offset)
+inline interval operator+(const interval& itv, double offset)
 {
 	return interval(itv.min + offset, itv.max + offset);
 }
 
-interval operator+(double offset, const interval& itv)
+inline interval operator+(double offset, const interval& itv)
 {
 	return itv + offset;
 }

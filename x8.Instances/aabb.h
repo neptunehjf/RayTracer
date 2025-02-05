@@ -17,7 +17,7 @@ public:
 	aabb(const interval& x, const interval& y, const interval& z) :
 		x(x), y(y), z(z) 
 	{
-
+		padding_box();
 	}
 
 	// 用两个点间接构造aabb，入参只需提供数据，不需要排序
@@ -26,6 +26,8 @@ public:
 		x = (a[0] <= b[0]) ? interval(a[0], b[0]) : interval(b[0], a[0]);
 		y = (a[1] <= b[1]) ? interval(a[1], b[1]) : interval(b[1], a[1]);
 		z = (a[2] <= b[2]) ? interval(a[2], b[2]) : interval(b[2], a[2]);
+		
+		padding_box();
 	}
 
 	// 用2个包围盒构造1个包围盒
@@ -123,12 +125,12 @@ public:
 const aabb aabb::empty = aabb(interval::empty, interval::empty, interval::empty);
 const aabb aabb::universe = aabb(interval::universe, interval::universe, interval::universe);
 
-aabb operator+(const aabb& bbox, const vec3& offset)
+inline aabb operator+(const aabb& bbox, const vec3& offset)
 {
 	return aabb(bbox.x + offset.x(), bbox.y + offset.y(), bbox.z + offset.z());
 }
 
-aabb operator+(const vec3& offset, const aabb& bbox)
+inline aabb operator+(const vec3& offset, const aabb& bbox)
 {
 	return bbox + offset;
 }

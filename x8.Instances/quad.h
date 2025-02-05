@@ -92,3 +92,28 @@ private:
 		return true;
 	}
 };
+
+inline shared_ptr<hittable_list> box(const point3& a, const point3& b, shared_ptr<material> mat)
+{
+	// 一个box可以看作6个quad，因此box是hittable_list
+	auto sides = make_shared<hittable_list>();
+
+	// 对角顶点min max
+	auto min = point3(fmin(a.x(), b.x()), fmin(a.y(), b.y()), fmin(a.z(), b.z()));
+	auto max = point3(fmax(a.x(), b.x()), fmax(a.y(), b.y()), fmax(a.z(), b.z()));
+
+	// quad的u v向量
+	auto dx = vec3(max.x() - min.x(), 0, 0);
+	auto dy = vec3(0, max.y() - min.y(), 0);
+	auto dz = vec3(0, 0, max.z() - min.z());
+
+	// 6个quad组成一个box
+	sides->add(make_shared<quad>(point3(min.x(), min.y(), max.z()), dx, dy, mat)); // front
+	sides->add(make_shared<quad>(point3(max.x(), min.y(), max.z()), -dz, dy, mat)); // right
+	sides->add(make_shared<quad>(point3(max.x(), min.y(), min.z()), -dx, dy, mat)); // back
+	sides->add(make_shared<quad>(point3(min.x(), min.y(), min.z()), dz, dy, mat)); // left
+	sides->add(make_shared<quad>(point3(min.x(), max.y(), max.z()), dx, -dz, mat)); // top
+	sides->add(make_shared<quad>(point3(min.x(), min.y(), min.z()), dx, dz, mat)); // bottom
+
+	return sides;
+}
