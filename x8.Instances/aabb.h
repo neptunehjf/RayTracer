@@ -122,3 +122,13 @@ public:
 // <定义>和类相同类型的静态变量是在类外部进行的，在此处会分配内存
 const aabb aabb::empty = aabb(interval::empty, interval::empty, interval::empty);
 const aabb aabb::universe = aabb(interval::universe, interval::universe, interval::universe);
+
+aabb operator+(const aabb& bbox, const vec3& offset)
+{
+	return aabb(bbox.x + offset.x(), bbox.y + offset.y(), bbox.z + offset.z());
+}
+
+aabb operator+(const vec3& offset, const aabb& bbox)
+{
+	return bbox + offset;
+}

@@ -52,3 +52,44 @@ public:
 	// 返回物体的包围盒
 	virtual aabb bounding_box() const = 0;
 };
+
+// 平移类，用于物体的平移
+// 1 对实际物体的的hit判断封装了一层，用光线(camera)反向位移的方式来对位移后的物体做hit判断
+// 用光线(camera)位移的方式，可以避免对复杂形状的实际物体进行位移操作
+// 2 但是对于实际物体的包围盒，因为包围盒形状简单，直接对包围盒做位移操作，这样不需要在每次hit都位移，只需初始化物体的时候位移。效率更高
+// 综上，对于实际物体，不位移实际物体，用光反向位移进行hit判断；对于包围盒，位移包围盒，用本来的光线进行hit判断
+class translate : public hittable
+{
+public:
+	translate(shared_ptr<hittable> object, const vec3& offset) : object(object), offset(offset)
+	{
+		bbox = object->bounding_box() + offset;
+	}
+
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
+	{
+		// 物体移动了offset ,相当于camera(光线起始点)移动-offset
+		ray offset_r(r.origin() + offset, r.direction(), r.time());
+
+		// 用移动后的光线与未移动的物体进行hit判断
+		if (object->hit(offset_r, ray_t, rec))
+		{
+			// 如果hit了，实际上是在rec.p + offset处hit的
+			rec.p += offset;
+			return true;
+		}
+		else
+			return false;
+
+	}
+
+	aabb bounding_box() const override
+	{
+		return bbox;
+	}
+
+private:
+	shared_ptr<hittable> object;
+	vec3 offset;
+	aabb bbox;
+};

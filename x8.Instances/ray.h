@@ -19,7 +19,7 @@ public:
 	}
 
 	// 获取当前时刻
-	double get_time() const
+	double time() const
 	{
 		return tm;
 	}

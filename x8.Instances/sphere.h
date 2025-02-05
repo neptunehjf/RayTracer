@@ -28,7 +28,7 @@ public:
 	// 显示加override关键字的好处是，一是可读性好，二是编译器会当作重写函数来检查
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
-        point3 current_center = center.at(r.get_time());
+        point3 current_center = center.at(r.time());
         point3 o = r.origin();
         vec3 d = r.direction();
         vec3 oc = current_center - o; // 根据ray的时刻算出球心位置

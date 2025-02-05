@@ -49,3 +49,13 @@ public:
 // <定义>和类相同类型的静态变量是在类外部进行的，在此处会分配内存
 const interval interval::empty = interval(inf, -inf);
 const interval interval::universe = interval(-inf, inf);
+
+interval operator+(const interval& itv, double offset)
+{
+	return interval(itv.min + offset, itv.max + offset);
+}
+
+interval operator+(double offset, const interval& itv)
+{
+	return itv + offset;
+}

@@ -45,7 +45,7 @@ public:
 			out_dir = rec.normal;
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
-		ray_out = ray(rec.p, out_dir, ray_in.get_time());
+		ray_out = ray(rec.p, out_dir, ray_in.time());
 		attenuation = tex->get_value(rec.u, rec.v, rec.p);
 
 		return true;
@@ -70,7 +70,7 @@ public:
 		out_dir = unit_vector(out_dir) + fuzz * random_unit_vector();
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
-		ray_out = ray(rec.p, out_dir, ray_in.get_time());
+		ray_out = ray(rec.p, out_dir, ray_in.time());
 		attenuation = albedo;
 
 		return true;
@@ -111,7 +111,7 @@ public:
 		}
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
-		ray_out = ray(rec.p, out_dir, ray_in.get_time());
+		ray_out = ray(rec.p, out_dir, ray_in.time());
 
 		// 不吸收能量，全部反射或者折射
 		attenuation = color(1.0, 1.0, 1.0); 
