@@ -63,12 +63,13 @@ class translate : public hittable
 public:
 	translate(shared_ptr<hittable> object, const vec3& offset) : object(object), offset(offset)
 	{
+		// 构造新包围盒
 		bbox = object->bounding_box() + offset;
 	}
 
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
-		// 物体移动了offset ,相当于camera(光线起始点)移动-offset
+		// 物体移动了offset ,相当于camera(光线)移动-offset
 		ray offset_r(r.origin() + offset, r.direction(), r.time());
 
 		// 用移动后的光线与未移动的物体进行hit判断
@@ -91,5 +92,94 @@ public:
 private:
 	shared_ptr<hittable> object;
 	vec3 offset;
+	aabb bbox;
+};
+
+// 旋转类，用于物体沿y轴旋转
+// 实现思路和上面的平移类是一致的
+class rotate_y : public hittable
+{
+public:
+	rotate_y(shared_ptr<hittable> object, double angle) : object(object)
+	{
+		double radian = degree_to_radian(angle);
+		sin_theta = sin(radian);
+		cos_theta = cos(radian);
+		bbox = object->bounding_box();
+
+		// 默认包围盒是empty
+		point3 min(inf, inf, inf);
+		point3 max(-inf, -inf, -inf);
+
+		// 对于包围盒的8个顶点，每个分别旋转theta，然后每次旋转都会更新min max的值，最后再用min max构建一个新的包围盒
+		for (int i = 0; i < 2; i++)
+			for (int j = 0; j < 2; j++)
+				for (int k = 0; k < 2; k++)
+				{
+					// 选择顶点
+					double x = (1 - i) * bbox.x.min + i * bbox.x.max;
+					double y = (1 - i) * bbox.y.min + i * bbox.y.max;
+					double z = (1 - i) * bbox.z.min + i * bbox.z.max;
+
+					// 旋转顶点
+					double x_rotate = x * cos_theta + z * sin_theta;
+					double z_rotate = x * (-sin_theta) + z * cos_theta;
+
+					// 更新min,max的值
+					vec3 temp(x_rotate, y, z_rotate);
+					for (int i = 0; i < 3; i++)
+					{
+						min[i] = fmin(min[i], temp[i]);
+						max[i] = fmin(max[i], temp[i]);
+					}
+				}
+
+		// 构造新包围盒
+		bbox = aabb(min, max);
+	}
+
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
+	{
+		// 物体旋转了theta ,相当于camera(光线)旋转-theta
+		// 结合旋转公式(参照referrence/rotation formula.jpg) 可得如下结果
+		auto origin = point3(r.origin().x() * cos_theta - r.origin().z() * sin_theta, 
+			                 r.origin().y(), 
+			                 r.origin().x() * sin_theta + r.origin().z() * cos_theta);
+
+		auto direction = vec3(r.direction().x() * cos_theta - r.direction().z() * sin_theta,
+					          r.direction().y(),
+			                  r.direction().x() * sin_theta + r.direction().z() * cos_theta);
+		
+		ray rotate_r(origin, direction, r.time());
+
+		// 用旋转后的光线与未旋转的物体进行hit判断
+		if (object->hit(rotate_r, ray_t, rec))
+		{
+			// 如果hit了，实际上是在rec.p 旋转了+theta处hit的
+			rec.p = point3(rec.p.x() * cos_theta + rec.p.z() * sin_theta,
+			               rec.p.y(),
+						   rec.p.x() * (-sin_theta) + rec.p.z() * cos_theta);
+
+			// 旋转的话，法线也应该还原成+theta的
+			rec.normal = point3(rec.normal.x() * cos_theta + rec.normal.z() * sin_theta,
+				                rec.normal.y(),
+				                rec.normal.x() * (-sin_theta) + rec.normal.z() * cos_theta);
+
+			return true;
+		}
+		else
+			return false;
+
+	}
+
+	aabb bounding_box() const override
+	{
+		return bbox;
+	}
+
+private:
+	shared_ptr<hittable> object;
+	double sin_theta;
+	double cos_theta;
 	aabb bbox;
 };
