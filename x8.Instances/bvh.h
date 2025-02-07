@@ -54,7 +54,7 @@ public:
 
 	}
 
-	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
+	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
 	{
 		// 如果未击中本节点，直接返回false
 		if (!bbox.hit(r, ray_t))

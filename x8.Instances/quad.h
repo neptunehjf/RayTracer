@@ -25,7 +25,7 @@ public:
 		w = n / dot(n, n);
 	}
 
-    bool hit(const ray& r, interval ray_t, hit_record& rec) const override
+    bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
     {
 		// ≤Œ’’ referrence/ray-quad-intersection.jpg ¢Ÿ
 

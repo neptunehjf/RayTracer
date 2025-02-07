@@ -49,7 +49,7 @@ public:
 	//  调用次数多(循环次数多 + 递归)，需要重点优化
 	//  对于width 400 sample 100的渲染场景，实装后渲染时间由77秒优化到36秒，优化效果不是很明显，进一步研究发现，是因为在频繁调用的hit函数内部申请了两个变量来接收ray_t.min和ray_t.max的原因。用以下方式优化后的时间缩短为11秒。
 	//	优化：
-	//	1 hit内部不申请变量，而是把入参ray_t改为值传递，并直接修改ray_t的值，这是最重要的优化点
+	//	1 hit内部不申请变量，而是直接修改ray_t的值，这是最重要的优化点
 	//	2 提前计算好倒数，后续乘倒数来实现除法
 	//	3 能加const修饰尽量加const
 	bool hit(const ray& r, interval ray_t) const
@@ -85,7 +85,7 @@ public:
 			//const double t_max = min(t1, ray_t.max);
 
 			// 复用虚参ray_t的内存区域，运行时间是11秒(width = 400 sample = 100)，效率较高
-			// 缺点是虚参无法传值出去
+			// ray_t被修改了也没关系，反正子包围盒一定在父包围盒内部
 			ray_t.min = max(t0, ray_t.min);
 			ray_t.max = min(t1, ray_t.max);
 

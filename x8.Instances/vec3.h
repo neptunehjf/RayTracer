@@ -56,7 +56,7 @@ public:
 	{
 		double a = 1e-8; //1³Ë10µÄ-8´Î·½
 
-		return (fabs(e[0] < a) && fabs(e[1] < a) && fabs(e[2] < a));
+		return (fabs(e[0]) < a) && (fabs(e[1]) < a) && (fabs(e[2]) < a);
 	}
 
 	static vec3 random()
