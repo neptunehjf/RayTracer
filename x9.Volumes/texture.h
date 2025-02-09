@@ -11,7 +11,7 @@ public:
 
 	// u,v UV映射的方式，提前准备的2D材质图片
 	// p   空间(spatial)材质的方式，每次在交点根据位置算出对应的材质颜色值
-	virtual color get_value(double u, double v, const point3& p) const = 0;
+	virtual color value(double u, double v, const point3& p) const = 0;
 };
 
 // 纯色
@@ -22,7 +22,7 @@ public:
 
 	solid_color(double r, double g, double b) : solid_color(color(r, g, b)) {}
 
-	color get_value(double u, double v, const point3& p) const override
+	color value(double u, double v, const point3& p) const override
 	{
 		// 纯色是固定值
 		return albedo;
@@ -43,7 +43,7 @@ public:
 		checker_texture(density, make_shared<solid_color>(c1), make_shared<solid_color>(c2)) {}
 
 	// 程式化生成奇偶交错的纯色
-	color get_value(double u, double v, const point3& p) const override
+	color value(double u, double v, const point3& p) const override
 	{
 		// 注意floor返回值和参数一致，所以要强制转换
 		auto x_integer = (int)floor(density * p.x());
@@ -52,7 +52,7 @@ public:
 
 		bool is_even = ((x_integer + y_integer + z_integer) % 2 == 0);
 
-		return is_even ? even->get_value(u, v, p) : odd->get_value(u, v, p);
+		return is_even ? even->value(u, v, p) : odd->value(u, v, p);
 	}
 
 private:
@@ -71,7 +71,7 @@ class image_texture : public texture
 public:
 	image_texture(const char* filename) : image(filename) {}
 
-	color get_value(double u, double v, const point3& p) const override 
+	color value(double u, double v, const point3& p) const override 
 	{
 		// 如果没读取到贴图，就返回青色
 		if (image.height() <= 0) return color(0.0, 1.0, 1.0);
@@ -99,7 +99,7 @@ public:
 	// perlin用默认构造体构造，不需要参数
 	noise_texture(double frenquency) : frenquency(frenquency) {}
 
-	color get_value(double u, double v, const point3& p) const
+	color value(double u, double v, const point3& p) const
 	{
 		// noise [-1, 1] => [0, 1]
 		// return color(1.0, 1.0, 1.0) * 0.5 * (1.0 + noise.noise(frenquency * p));

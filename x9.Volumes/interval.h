@@ -43,12 +43,12 @@ public:
 	}
 
 	// <声明>和类相同类型的静态变量是合法的，<声明>不会分配内存，因此不会导致递归定义
-	static const interval empty, universe;
+	static interval empty, universe;
 };
 
 // <定义>和类相同类型的静态变量是在类外部进行的，在此处会分配内存
-const interval interval::empty = interval(inf, -inf);
-const interval interval::universe = interval(-inf, inf);
+interval interval::empty = interval(inf, -inf);
+interval interval::universe = interval(-inf, inf);
 
 inline interval operator+(const interval& itv, double offset)
 {

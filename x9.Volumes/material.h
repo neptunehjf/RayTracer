@@ -46,7 +46,7 @@ public:
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
 		ray_out = ray(rec.p, out_dir, ray_in.time());
-		attenuation = tex->get_value(rec.u, rec.v, rec.p);
+		attenuation = tex->value(rec.u, rec.v, rec.p);
 
 		return true;
 	}
@@ -142,7 +142,27 @@ public:
 
 	color emit(double u, double v, const point3& p) const override
 	{
-		return tex->get_value(u, v, p);
+		return tex->value(u, v, p);
+	}
+
+private:
+	shared_ptr<texture> tex;
+};
+
+// 各项同性材料，在各个方向上性质相同。
+// 此处可简单地认为散射方向在个方向的几率是相等的
+class isotropic : public material 
+{
+public:
+	isotropic(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
+	isotropic(shared_ptr<texture> tex) : tex(tex) {}
+
+	bool scatter(const ray& ray_in, const hit_record& rec,
+		         color& attenuation, ray& ray_out) const override
+	{
+		ray_out = ray(rec.p, random_unit_vector(), ray_in.time());
+		attenuation = tex->value(rec.u, rec.v, rec.p);
+		return true;
 	}
 
 private:

@@ -41,7 +41,7 @@ public:
 
             for (int i = 0; i < image_width; i++)
             {
-                //if (i + 1 == 220 && j + 1 == 92) // for debug
+                //if (i + 1 == 220 && j + 1 == 500) // for debug
                 {
                     color pixel_color = vec3(0.0, 0.0, 0.0);
 

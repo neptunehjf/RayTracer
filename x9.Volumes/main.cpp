@@ -6,6 +6,7 @@
 #include "bvh.h"
 #include "texture.h"
 #include "quad.h"
+#include "volume.h"
 
 void scene_bouncing_spheres() 
 {
@@ -296,6 +297,50 @@ void scene_cornell_box()
     cam.render(scene);
 }
 
+void scene_cornell_smoke() {
+    hittable_list scene;
+
+    auto red = make_shared<diffuse>(color(.65, .05, .05));
+    auto white = make_shared<diffuse>(color(.73, .73, .73));
+    auto green = make_shared<diffuse>(color(.12, .45, .15));
+    auto light = make_shared<diffuse_light>(color(7, 7, 7));
+
+    scene.add(make_shared<quad>(point3(555, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), green));
+    scene.add(make_shared<quad>(point3(0, 0, 0), vec3(0, 555, 0), vec3(0, 0, 555), red));
+    scene.add(make_shared<quad>(point3(113, 554, 127), vec3(330, 0, 0), vec3(0, 0, 305), light));
+    scene.add(make_shared<quad>(point3(0, 555, 0), vec3(555, 0, 0), vec3(0, 0, 555), white));
+    scene.add(make_shared<quad>(point3(0, 0, 0), vec3(555, 0, 0), vec3(0, 0, 555), white));
+    scene.add(make_shared<quad>(point3(0, 0, 555), vec3(555, 0, 0), vec3(0, 555, 0), white));
+
+    shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+    box1 = make_shared<rotate_y>(box1, 15);
+    box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+
+    shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
+    box2 = make_shared<rotate_y>(box2, -18);
+    box2 = make_shared<translate>(box2, vec3(130, 0, 65));
+
+    scene.add(make_shared<volume>(box1, 0.01, red));
+    scene.add(make_shared<volume>(box2, 0.01, green));
+
+    camera cam;
+
+    cam.aspect_radio = 1.0;
+    cam.image_width = 600;
+    cam.sample_num = 200;
+    cam.bounce_limit = 50;
+    cam.background = color(0, 0, 0);
+
+    cam.vfov = 40;
+    cam.look_from = point3(278, 278, -800);
+    cam.look_at = point3(278, 278, 0);
+    cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0;
+
+    cam.render(scene);
+}
+
 int main()
 {
     time_t start_time, end_time;
@@ -303,7 +348,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (7)
+    switch (8)
     {
     case 1:
         scene_bouncing_spheres();
@@ -325,6 +370,9 @@ int main()
         break;
     case 7:
         scene_cornell_box();
+        break;
+    case 8:
+        scene_cornell_smoke();
         break;
     default:
         break;
