@@ -17,7 +17,7 @@ public:
 	{}
 
 	// 根据密度和概率算出在volume内部hit的位置
-	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
 		hit_record rec1, rec2;
 

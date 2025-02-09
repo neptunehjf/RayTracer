@@ -47,7 +47,7 @@ public:
 	virtual ~hittable() = default;
 
 	// 纯虚函数，具体放到子类实现
-	virtual bool hit(const ray& r, interval& ray_t, hit_record& rec) const = 0;
+	virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
 
 	// 返回物体的包围盒
 	virtual aabb bounding_box() const = 0;
@@ -67,7 +67,7 @@ public:
 		bbox = object->bounding_box() + offset;
 	}
 
-	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
 		// 物体移动了offset ,相当于camera(光线)移动-offset
 		ray offset_r(r.origin() - offset, r.direction(), r.time());
@@ -138,7 +138,7 @@ public:
 		bbox = aabb(min, max);
 	}
 
-	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
 		// 物体旋转了theta ,相当于camera(光线)旋转-theta
 		// 结合旋转公式(参照referrence/rotation formula.jpg) 可得如下结果

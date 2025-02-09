@@ -26,10 +26,11 @@ public:
 	void clear() { objects.clear(); }
 
 	// override hittable
-	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
-		// hit_record temp_rec;
+		hit_record temp_rec;
 		bool is_hit = false;
+		double closest_so_far = ray_t.max;
 
 		// 对于一组hittable对象，只需找到最近的交点
 		// 因此用上次循环中找到的最近的t值 
@@ -37,9 +38,10 @@ public:
 		// 2 动态修改判定范围的最大值,效率比较高
 		for (const auto& object : objects)
 		{
-			if (object->hit(r, ray_t, rec))
+			if (object->hit(r, interval(ray_t.min, closest_so_far), temp_rec))
 			{
-				ray_t.max = rec.t;
+				closest_so_far = temp_rec.t;
+				rec = temp_rec;
 				is_hit = true;
 			}		
 		}

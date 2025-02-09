@@ -320,8 +320,8 @@ void scene_cornell_smoke() {
     box2 = make_shared<rotate_y>(box2, -18);
     box2 = make_shared<translate>(box2, vec3(130, 0, 65));
 
-    scene.add(make_shared<volume>(box1, 0.01, red));
-    scene.add(make_shared<volume>(box2, 0.01, green));
+    scene.add(make_shared<volume>(box1, 0.01, color(0, 0, 0)));
+    scene.add(make_shared<volume>(box2, 0.01, color(1, 1, 1)));
 
     camera cam;
 
