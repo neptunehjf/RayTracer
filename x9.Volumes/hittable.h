@@ -118,8 +118,8 @@ public:
 				{
 					// 选择顶点
 					double x = (1 - i) * bbox.x.min + i * bbox.x.max;
-					double y = (1 - i) * bbox.y.min + i * bbox.y.max;
-					double z = (1 - i) * bbox.z.min + i * bbox.z.max;
+					double y = (1 - j) * bbox.y.min + j * bbox.y.max;
+					double z = (1 - k) * bbox.z.min + k * bbox.z.max;
 
 					// 旋转顶点
 					double x_rotate = x * cos_theta + z * sin_theta;
