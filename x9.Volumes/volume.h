@@ -54,7 +54,7 @@ public:
 		// ≤Œ’’referrence/volume_scatter2.png
 		double hit_distance = neg_inv_density * log(random_double());
 
-		if (hit_distance < distance)
+		if (hit_distance > distance)
 			return false;
 
 		rec.t = rec1.t + hit_distance / ray_speed;
