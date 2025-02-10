@@ -36,7 +36,7 @@ public:
         {
             // отй╬╫Ь╤х
             clog << "\rScanlines remaining: " << (image_height - j) << ' ' 
-                 << " Unhit Count: " << unhit_count << " Hit Count: " 
+                 << " BBox Unhit Count: " << unhit_count << " BBox Hit Count: " 
                  << hit_count << flush;
 
             for (int i = 0; i < image_width; i++)
