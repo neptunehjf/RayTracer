@@ -427,19 +427,23 @@ void test_monte_carlo()
 
     // 落在圆内的采样数
     size_t n = 0;
-    // 总采样数
-    size_t N = 100000;
+    // 运行计数
+    size_t cnt = 0;
 
-    for (size_t i = 0; i < N; i++)
+    while (true)
     {
+        cnt++;
+
         double x = random_double(-1, 1);
         double y = random_double(-1, 1);
 
         if (x * x + y * y < 1)
             n++;
-    }
 
-    clog << "Estimated Pi: " << 4.0 * n / N << endl;
+        // 每隔100000次采样打印一次结果
+        if (cnt % 100000 == 0)
+            clog << "Estimated Pi: " << 4.0 * n / cnt << endl;      
+    }
 }
 
 int main()
