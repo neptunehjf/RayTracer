@@ -12,6 +12,7 @@ public:
 	int image_width = 100;
     int sample_num = 10;
     int bounce_limit = 10;
+    int sqrt_sample_num = 10;
 
     double vfov = 90.0;                         // 竖直方向的FOV
     point3 look_from = point3(0.0, 0.0, 0.0);   // cam视线起点
@@ -45,14 +46,15 @@ public:
                 {
                     color pixel_color = vec3(0.0, 0.0, 0.0);
 
-                    for (int n = 0; n < sample_num; n++)
-                    {
-                        // 求出每一个camera到像素中心附近的随机采样到的射线
-                        ray r = get_ray(i, j);
+                    for (int i_jitter = 0; i_jitter < sqrt_sample_num; i_jitter++)
+                        for (int j_jitter = 0; j_jitter < sqrt_sample_num; j_jitter++)
+                        {
+                            // 求出每一个camera到像素中心附近的随机采样到的射线
+                            ray r = get_ray(i, j, i_jitter, j_jitter);
 
-                        // 根据ray算出color，累加起来，最后除以采样数以达到平滑的效果
-                        pixel_color += ray_color(r, scene, 0);
-                    }
+                            // 根据ray算出color，累加起来，最后除以采样数以达到平滑的效果
+                            pixel_color += ray_color(r, scene, 0);
+                        }
 
                     pixel_color /= sample_num;
                     write_color(cout, pixel_color);
@@ -79,6 +81,8 @@ private:
         image_height = (image_height < 1) ? 1 : image_height;  // 保证不小于1
       
         cam_pos = look_from;
+
+        sqrt_sample_num = (int)sqrt(sample_num);
 
         double theta = degree_to_radian(vfov); // tan是按弧度值实现的，必须提供弧度制而不是角度值
         double viewport_h = 2 * focus_dist * tan(theta / 2); // 参考referrence/camera1.png
@@ -115,9 +119,9 @@ private:
     // 如果是光栅化，因为光栅化采样的最小单位就是像素，在同一个像素内采样没有任何作用
     // 光追的情形，viewport的一个像素内的位置改变，也会导致光线ray方向改变，所以采样是有效的
     // 总之，光栅化的采样最小单位是像素，光追的采样最小单位是光线ray，像素是有限的而光线ray可以是无限的，高下立判
-    ray get_ray(int i, int j) const
+    ray get_ray(int i, int j, int i_jitter, int j_jitter) const
     {
-        vec3 offset = offset_square();
+        vec3 offset = offset_square(i_jitter, j_jitter);
         point3 pixel = pixel_zero + ((i + offset.x()) * pixel_u) 
                                   + ((j + offset.y()) * pixel_v);
         point3 ray_origin = (defocus_angle <= 0) ? cam_pos : defocus_disk_sample();
@@ -129,9 +133,15 @@ private:
 
     // 生成一个在xy方向上的随机偏移量，在-0.5,0.5之间 Z方向无偏移量
     // 可用于在方形区域随机采样
-    vec3 offset_square() const
+    vec3 offset_square(int i_jitter, int j_jitter) const
     {
-        return vec3(-0.5 + random_double(), -0.5 + random_double(), 0.0);
+        // 通过分级采样(抖动)，使采样更均匀，加速收敛
+        // 参照referrence/Monte Carlo Estimating Pi Jittering.png
+        // [0,1) => [-0.5, 0.5)
+        double x = (i_jitter + random_double()) / sqrt_sample_num - 0.5;
+        double y = (j_jitter + random_double()) / sqrt_sample_num - 0.5;
+
+        return vec3(x, y, 0.0);
     }
 
     // 计算光线的颜色

@@ -284,7 +284,7 @@ void scene_cornell_box()
 
     cam.aspect_radio = 1.0;
     cam.image_width = 600;
-    cam.sample_num = 200;
+    cam.sample_num = 64;
     cam.bounce_limit = 50;
     cam.background = color(0, 0, 0);
 
@@ -428,11 +428,11 @@ void test_monte_carlo()
     // 落在圆内的采样数
     size_t n = 0;
     size_t n_jitter = 0;
-    // 抖动采样数N_jitter * N_jitter
-    size_t N_jitter = 1000;
+    // 抖动采样数的平方根
+    size_t sqrt_N_jitter = 1000;
 
-    for (int i = 0; i < N_jitter; i++)
-        for(int j = 0; j < N_jitter; j++)
+    for (int i = 0; i < sqrt_N_jitter; i++)
+        for(int j = 0; j < sqrt_N_jitter; j++)
         {
             double x = random_double(-1, 1);
             double y = random_double(-1, 1);
@@ -442,13 +442,13 @@ void test_monte_carlo()
             // 通过分级采样(抖动)，使采样更均匀，加速收敛
             // 参照referrence/Monte Carlo Estimating Pi Jittering.png
             // [0,1) => [-1, 1)
-            x = 2 * ((i + random_double()) / N_jitter) - 1;
-            y = 2 * ((j + random_double()) / N_jitter) - 1;
+            x = 2 * ((i + random_double()) / sqrt_N_jitter) - 1;
+            y = 2 * ((j + random_double()) / sqrt_N_jitter) - 1;
             if (x * x + y * y < 1)
                 n_jitter++;
         }
-    clog << "Estimated Pi: " << 4.0 * n / (N_jitter * N_jitter) << endl;
-    clog << "Estimated Pi with Jittering: " << 4.0 * n_jitter / (N_jitter * N_jitter) << endl;
+    clog << "Estimated Pi: " << 4.0 * n / (sqrt_N_jitter * sqrt_N_jitter) << endl;
+    clog << "Estimated Pi with Jittering: " << 4.0 * n_jitter / (sqrt_N_jitter * sqrt_N_jitter) << endl;
 }
 
 // 通过正方形和其内切圆估算Pi值
@@ -485,7 +485,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (10)
+    switch (7)
     {
     case 1:
         scene_bouncing_spheres();
