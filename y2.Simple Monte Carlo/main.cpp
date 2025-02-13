@@ -427,6 +427,38 @@ void test_monte_carlo()
 
     // 落在圆内的采样数
     size_t n = 0;
+    size_t n_jitter = 0;
+    // 抖动采样数N_jitter * N_jitter
+    size_t N_jitter = 1000;
+
+    for (int i = 0; i < N_jitter; i++)
+        for(int j = 0; j < N_jitter; j++)
+        {
+            double x = random_double(-1, 1);
+            double y = random_double(-1, 1);
+            if (x * x + y * y < 1)
+                n++;
+
+            // 通过分级采样(抖动)，使采样更均匀，加速收敛
+            // 参照referrence/Monte Carlo Estimating Pi Jittering.png
+            // [0,1) => [-1, 1)
+            x = 2 * ((i + random_double()) / N_jitter) - 1;
+            y = 2 * ((j + random_double()) / N_jitter) - 1;
+            if (x * x + y * y < 1)
+                n_jitter++;
+        }
+    clog << "Estimated Pi: " << 4.0 * n / (N_jitter * N_jitter) << endl;
+    clog << "Estimated Pi with Jittering: " << 4.0 * n_jitter / (N_jitter * N_jitter) << endl;
+}
+
+// 通过正方形和其内切圆估算Pi值
+// 参照referrence/Monte Carlo Estimating Pi.jpg
+void test_monte_carlo_converage()
+{
+    clog << fixed << setprecision(12);
+
+    // 落在圆内的采样数
+    size_t n = 0;
     // 运行计数
     size_t cnt = 0;
 
@@ -484,6 +516,9 @@ int main()
         break;
     case 10:
         test_monte_carlo();
+        break;
+    case 11:
+        test_monte_carlo_converage();
         break;
     default:
         scene_final(400, 250, 4);
