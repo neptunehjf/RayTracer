@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "quad.h"
 #include "volume.h"
+#include <iomanip>
 
 void scene_bouncing_spheres() 
 {
@@ -418,6 +419,29 @@ void scene_final(int image_width, int samples_num, int bounce_limit)
     cam.render(scene);
 }
 
+// 通过正方形和其内切圆估算Pi值
+// 参照referrence/Monte Carlo Estimating Pi.jpg
+void test_monte_carlo()
+{
+    clog << fixed << setprecision(12);
+
+    // 落在圆内的采样数
+    size_t n = 0;
+    // 总采样数
+    size_t N = 100000;
+
+    for (size_t i = 0; i < N; i++)
+    {
+        double x = random_double(-1, 1);
+        double y = random_double(-1, 1);
+
+        if (x * x + y * y < 1)
+            n++;
+    }
+
+    clog << "Estimated Pi: " << 4.0 * n / N << endl;
+}
+
 int main()
 {
     time_t start_time, end_time;
@@ -425,7 +449,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (9)
+    switch (10)
     {
     case 1:
         scene_bouncing_spheres();
@@ -453,6 +477,9 @@ int main()
         break;
     case 9:
         scene_final(800, 10000, 40);
+        break;
+    case 10:
+        test_monte_carlo();
         break;
     default:
         scene_final(400, 250, 4);
