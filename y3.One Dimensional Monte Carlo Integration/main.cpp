@@ -478,7 +478,7 @@ void test_monte_carlo_pi_converage()
     }
 }
 
-// 求x2在[0,2]上的积分
+// 用monte carlo求x2在[0,2]上的积分
 void test_monte_carlo_integrate_x2()
 {
     clog << fixed << setprecision(12);
@@ -500,6 +500,60 @@ void test_monte_carlo_integrate_x2()
     clog << "Integrate of x2: " << (b - a) * (sum / N) << endl;
 }
 
+// 用monte carlo求复杂pdf函数的halfway point（指刚好把概率积分对半分的采样点）
+// 复杂pdf函数参照referrence/complex_pdf.png
+// 如果递归下去，可以通过概率积分得到每一个采样点
+// 说白了就是建立pdf的积分与采样点的联系
+void test_monte_carlo_halfway_point()
+{
+    clog << fixed << setprecision(12);
+
+    // 总采样数
+    const size_t N = 10000;
+    // 采样数组
+    sample spl[N] = { 0 };
+    // 采样范围interval[0,2 * pi]
+    double a = 0, b = 2 * pi;
+    // 所有采样点的pdf总和
+    double sum = 0;
+    // 2pi的倒数，提前计算以提高效率
+    double inv_2pi = 1 / (2 * pi);
+
+    for (int i = 0; i < N; i++)
+    {
+        double x = random_double(a, b); //采样点
+        double sin_x = sin(x);
+        double p_x = exp(-x * inv_2pi) * sin_x * sin_x; //pdf(x)
+        sum += p_x;
+
+        // 采样结果存入数组(未排序)
+        spl[i].x = x;
+        spl[i].p_x = p_x;
+    }
+
+    // 按x从小到大顺序排序采样数组
+    sort(begin(spl), end(spl), compare_by_x);
+
+    // 计算halfway point
+    double half_sum = sum / 2;
+    double halfway_point;
+    double accum = 0;
+
+    for (int i = 0; i < N; i++)
+    {
+        accum += spl[i].p_x;
+        if (accum >= half_sum)
+        {
+            halfway_point = spl[i].x;
+            break;
+        }
+    }
+
+    clog << "Average: " << sum / N << endl;
+    clog << "Integrate: " << (b - a) * sum / N << endl;
+    clog << "Halfway point: " << halfway_point << endl;
+}
+
 int main()
 {
     time_t start_time, end_time;
@@ -507,7 +561,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (12)
+    switch (13)
     {
     case 1:
         scene_bouncing_spheres();
@@ -544,6 +598,9 @@ int main()
         break;
     case 12:
         test_monte_carlo_integrate_x2();
+        break;
+    case 13:
+        test_monte_carlo_halfway_point();
         break;
     default:
         scene_final(400, 250, 4);
