@@ -48,18 +48,6 @@ inline int random_int(int min, int max)
 	return (int)(random_double(min, max + 1));
 }
 
-/**************Monte Carlo采样相关****************/
-struct sample {
-	double x;   // 采样点
-	double p_x; // 该采样点的概率pdf(x)
-};
-
-inline bool compare_by_x(const sample& s1, const sample& s2)
-{
-	return s1.x < s2.x;
-}
-/**************Monte Carlo采样相关****************/
-
 // Common Headers
 #include "vec3.h"
 #include "color.h"

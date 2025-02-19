@@ -423,8 +423,6 @@ void scene_final(int image_width, int samples_num, int bounce_limit)
 // 参照referrence/Monte Carlo Estimating Pi.jpg
 void test_monte_carlo_pi()
 {
-    clog << fixed << setprecision(12);
-
     // 落在圆内的采样数
     size_t n = 0;
     size_t n_jitter = 0;
@@ -447,6 +445,8 @@ void test_monte_carlo_pi()
             if (x * x + y * y < 1)
                 n_jitter++;
         }
+
+    clog << fixed << setprecision(12);
     clog << "Estimated Pi: " << 4.0 * n / (sqrt_N_jitter * sqrt_N_jitter) << endl;
     clog << "Estimated Pi with Jittering: " << 4.0 * n_jitter / (sqrt_N_jitter * sqrt_N_jitter) << endl;
 }
@@ -481,8 +481,6 @@ void test_monte_carlo_pi_converage()
 // 用monte carlo求x2在[0,2]上的积分
 void test_monte_carlo_integrate_x2()
 {
-    clog << fixed << setprecision(12);
-
     // 总采样数
     size_t N = 1000000;
     // 采样范围interval[0,2]
@@ -496,6 +494,7 @@ void test_monte_carlo_integrate_x2()
         sum += (x * x);
     }
 
+    clog << fixed << setprecision(12);
     // integrate = interval * average，采样次数N越多，average越接近expect
     clog << "Integrate of x2: " << (b - a) * (sum / N) << endl;
 }
@@ -506,8 +505,6 @@ void test_monte_carlo_integrate_x2()
 // 说白了就是建立pdf的积分与采样点的联系
 void test_monte_carlo_halfway_point()
 {
-    clog << fixed << setprecision(12);
-
     // 总采样数
     const size_t N = 10000;
     // 采样数组
@@ -549,9 +546,55 @@ void test_monte_carlo_halfway_point()
         }
     }
 
+    clog << fixed << setprecision(12);
     clog << "Average: " << sum / N << endl;
     clog << "Integrate: " << (b - a) * sum / N << endl;
     clog << "Halfway point: " << halfway_point << endl;
+}
+
+// Monte Carlo之重要性采样 求x2在[0,2]上的积分
+// 参照referrence/Importance Sampling.jpg 的
+void test_importance_sampling_x2()
+{
+    cout << fixed << setprecision(12);
+    int N = 1000000;
+    double sum = 0;
+
+    cout << "Sample nums = " << N << endl;
+    // pdf为常数函数(等于没有重要性采样，但是可以基于此扩展成线性函数，二次函数等)
+    for (int i = 0; i < N; i++) 
+    {
+        double x = icd_uniform(random_double());
+        sum += x * x / pdf_uniform(x); // 除以pdf相当于乘以interval
+    }
+    
+    cout << "Integrate of x2 with uniform pdf = " << (sum / N) << endl;
+
+    // pdf为线性函数
+    sum = 0;
+
+    for (int i = 0; i < N; i++)
+    {
+        double d = random_double();
+        if (d < 1e-8) // 防止NaN的情况
+            continue;
+        double x = icd_linear(d);
+        sum += x * x / pdf_linear(x); // 除以pdf相当于乘以interval
+    }
+
+    cout << "Integrate of x2 with linear pdf = " << (sum / N) << endl;
+
+    // pdf为二次函数
+    sum = 0;
+    for (int i = 0; i < N; i++)
+    {
+        double d = random_double();
+        if (d < 1e-8) // 防止NaN的情况
+            continue;
+        double x = icd_quadratic(d);
+        sum += x * x / pdf_quadratic(x); // 除以pdf相当于乘以interval
+    }
+    cout << "Integrate of x2 with quadratic pdf = " << (sum / N) << endl;
 }
 
 int main()
@@ -561,7 +604,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (13)
+    switch (14)
     {
     case 1:
         scene_bouncing_spheres();
@@ -601,6 +644,9 @@ int main()
         break;
     case 13:
         test_monte_carlo_halfway_point();
+        break;
+    case 14:
+        test_importance_sampling_x2();
         break;
     default:
         scene_final(400, 250, 4);
