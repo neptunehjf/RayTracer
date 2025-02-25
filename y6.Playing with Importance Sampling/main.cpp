@@ -284,7 +284,7 @@ void scene_cornell_box()
 
     cam.aspect_radio = 1.0;
     cam.image_width = 600;
-    cam.sample_num = 64;
+    cam.sample_num = 1000;
     cam.bounce_limit = 50;
     cam.background = color(0, 0, 0);
 
@@ -295,6 +295,7 @@ void scene_cornell_box()
 
     cam.defocus_angle = 0;
 
+    clog << "sample per pixel: " << cam.sample_num << endl;
     cam.render(scene);
 }
 
@@ -628,7 +629,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (15)
+    switch (7)
     {
     case 1:
         scene_bouncing_spheres();

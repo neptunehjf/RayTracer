@@ -25,6 +25,12 @@ public:
 	{
 		return color(0, 0, 0);
 	}
+
+	// 获取当前渲染的散射方向的pdf，也就是最终的收敛目标
+	virtual double scatter_pdf(const ray& ray_in, const hit_record& rec, const ray& ray_out) const
+	{
+		return 0;
+	}
 };
 
 class diffuse : public material
@@ -49,6 +55,14 @@ public:
 		attenuation = tex->value(rec.u, rec.v, rec.p);
 
 		return true;
+	}
+
+	// 获取当前渲染的散射方向的pdf，也就是最终的收敛目标
+	// 参照 referrence/Lambertian Scatter PDF.jpg
+	double scatter_pdf(const ray& ray_in, const hit_record& rec, const ray& ray_out) const override
+	{
+		double cos_theta = dot(rec.normal, unit_vector(ray_out.direction()));
+		return cos_theta < 0 ? 0 : cos_theta / pi;
 	}
 
 private:

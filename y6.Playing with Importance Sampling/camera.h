@@ -10,7 +10,7 @@ class camera
 public:
 	double aspect_radio = 1.0;
 	int image_width = 100;
-    int sample_num = 10;
+    int sample_num = 10; //每个像素的采样数
     int bounce_limit = 10;
     int sqrt_sample_num = 10;
 
@@ -172,7 +172,13 @@ private:
             if (rec.mat->scatter(r, rec, attenuation, ray_out))
             {
                 total_bounce++;
-                return attenuation * ray_color(ray_out, scene, ++bounce_count);
+                double scatter_pdf = rec.mat->scatter_pdf(r, rec, ray_out);
+                // sample_pdf和scatter_pdf完全一样，则实际没进行重要性采样，只是形式变成了重要性采样
+                // 把sample_pdf设成scatter_pdf，debug时可以排除采样的干扰，判断收敛目标(散射函数)本身是否有问题
+                double sample_pdf = scatter_pdf;
+                // 参照 referrence/Importance Sampling.png
+                return attenuation * ray_color(ray_out, scene, ++bounce_count) * 
+                       scatter_pdf / sample_pdf;
             }
             // 如果当前交点在光源材质，则只需返回光源颜色
             else
