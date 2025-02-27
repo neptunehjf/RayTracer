@@ -623,6 +623,67 @@ void test_cos2_on_unit_sphere()
     clog << "Integrate of cos_theta square: " << sum / N << endl;
 }
 
+// 打印出在任意方向上均匀分布的样本
+// 参照referrence/uniform_sample_sphere.jpg
+void test_uniform_sample_on_unit_sphere()
+{
+    for (int i = 0; i < 200; i++) 
+    {
+        double r1 = random_double();
+        double r2 = random_double();
+        double x = cos(2 * pi * r1) * 2 * sqrt(r2 * (1 - r2));
+        double y = sin(2 * pi * r1) * 2 * sqrt(r2 * (1 - r2));
+        double z = 1 - 2 * r2;
+        clog << x << " " << y << " " << z << endl;
+    }
+}
+
+// 在半球上采样求cos的3次方的积分
+// 参照referrence/cos_cube_hemi_sample.jpg
+// 手算结果是pi/2，采样结果收敛于pi/2，验证了采样pdf是无偏的
+void test_cos_cube_hemi_sample()
+{
+    int N = 1000000;
+
+    double sum = 0.0;
+    for (int i = 0; i < N; i++) 
+    {
+        double r2 = random_double();
+        sum += f_cos_cube(1 - r2) / pdf_hemi();
+    }
+
+    clog << fixed << setprecision(12);
+    clog << "PI/2 = " << pi / 2.0 << endl;
+    clog << "Estimate = " << sum / N << endl;
+}
+
+
+// 在cos/pi上采样求cos的3次方的积分
+// 参照referrence/cos_cube_cos_sample.png
+// 手算结果是pi/2，采样结果收敛于pi/2，验证了采样pdf是无偏的
+void test_cos_cube_cos_sample()
+{
+    int N = 1000000;
+
+    double sum = 0.0;
+    for (int i = 0; i < N; i++) 
+    {
+        //double r1 = random_double();
+        double r2 = random_double();
+
+        //double phi = 2 * pi * r1;
+        //double x = cos(phi) * sqrt(r2);
+        //double y = sin(phi) * sqrt(r2);
+        double z = sqrt(1 - r2); // 因为是单位向量 z等于cos theta
+
+        sum += f_cos_cube(z) / pdf_cos(z);
+    }
+
+    clog << fixed << setprecision(12);
+    clog << "PI/2 = " << pi / 2.0 << endl;
+    clog << "Estimate = " << sum / N << endl;
+}
+
 int main()
 {
     time_t start_time, end_time;
@@ -630,7 +691,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (7)
+    switch (18)
     {
     case 1:
         scene_bouncing_spheres();
@@ -676,6 +737,15 @@ int main()
         break;
     case 15:
         test_cos2_on_unit_sphere();
+        break;
+    case 16:
+        test_uniform_sample_on_unit_sphere();
+        break;
+    case 17:
+        test_cos_cube_hemi_sample();
+        break;
+    case 18:
+        test_cos_cube_cos_sample();
         break;
     default:
         scene_final(400, 250, 4);

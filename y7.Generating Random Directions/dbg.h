@@ -50,4 +50,19 @@ inline double pdf_sphere_uniform(const vec3& d)
 	return 1 / (4 * pi);
 }
 
+inline double f_cos_cube(double z)
+{
+	return z * z * z;
+}
+
+inline double pdf_hemi()
+{
+	return 1.0 / (2.0 * pi);
+}
+
+inline double pdf_cos(double z)
+{
+	return z / pi;
+}
+
 /**************Monte Carlo采样相关****************/
