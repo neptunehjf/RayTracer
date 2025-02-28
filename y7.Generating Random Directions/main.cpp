@@ -659,7 +659,8 @@ void test_cos_cube_hemi_sample()
 
 
 // 在cos/pi上采样求cos的3次方的积分
-// 参照referrence/cos_cube_cos_sample.png
+// 参照referrence/cos_cube_cos_sample.png 
+// 参照referrence/Lambertian Scatter PDF.jpg
 // 手算结果是pi/2，采样结果收敛于pi/2，验证了采样pdf是无偏的
 void test_cos_cube_cos_sample()
 {
