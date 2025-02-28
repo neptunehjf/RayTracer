@@ -2,6 +2,7 @@
 
 #include "hittable.h"
 #include "texture.h"
+#include "onb.h"
 
 class material
 {
@@ -14,7 +15,7 @@ public:
 	// attenuation 能量衰减(对于物体表面吸收的能量来说)，就是被反射能量比例
 	// ray_out 出射光线（散射光线）
 	virtual bool scatter(const ray& ray_in, const hit_record& rec,
-		                 color& attenuation, ray& ray_out) const
+		                 color& attenuation, ray& ray_out, double& pdf) const
 	{
 		return false;
 	}
@@ -40,11 +41,16 @@ public:
 	diffuse(shared_ptr<texture> tex) : tex(tex) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
-		color& attenuation, ray& ray_out) const override
+		color& attenuation, ray& ray_out, double& pdf) const override
 	{
 		// 根据lambertian reflection模型算出的随机反射方向，和normal夹角越小，概率越大
 		// 参考referrence/lambertian reflection.png
-		vec3 out_dir = rec.normal + random_unit_vector();
+		//vec3 out_dir = rec.normal + random_unit_vector();
+
+		// 先根据z轴生成随机向量，再把坐标系转成法线作为z轴的坐标空间(切线坐标)
+		// 参考referrence/lambertian reflection.png
+		onb uvw(rec.normal);
+		vec3 out_dir = uvw.transform(random_cosine_direction());
 
 		//防止dir是0向量的情况
 		if (out_dir.near_zero())
@@ -53,6 +59,7 @@ public:
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
 		ray_out = ray(rec.p, out_dir, ray_in.time());
 		attenuation = tex->value(rec.u, rec.v, rec.p);
+		pdf = dot(uvw.w(), ray_out.direction()) / pi;
 
 		return true;
 	}
@@ -75,7 +82,7 @@ public:
 	metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1.0 ? fuzz : 1.0) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
-		color& attenuation, ray& ray_out) const override
+		color& attenuation, ray& ray_out, double& pdf) const override
 	{
 		vec3 out_dir = reflect(ray_in.direction(), rec.normal);
 		// fuzz:金属反射后再进行一次方向随机，使金属看起来有磨砂效果
@@ -101,7 +108,7 @@ public:
 	dielectric(double refraction_index) : refraction_index(refraction_index) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
-		color& attenuation, ray& ray_out) const override
+		color& attenuation, ray& ray_out, double& pdf) const override
 	{
 		double ri = rec.front_face ? (1.0 / refraction_index) : refraction_index;
 
@@ -172,11 +179,17 @@ public:
 	isotropic(shared_ptr<texture> tex) : tex(tex) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
-		         color& attenuation, ray& ray_out) const override
+		         color& attenuation, ray& ray_out, double& pdf) const override
 	{
 		ray_out = ray(rec.p, random_unit_vector(), ray_in.time());
 		attenuation = tex->value(rec.u, rec.v, rec.p);
+		pdf = 1 / (4 * pi);
 		return true;
+	}
+
+	double scatter_pdf(const ray& ray_in, const hit_record& rec, const ray& ray_out) const override
+	{
+		return 1 / (4 * pi);
 	}
 
 private:

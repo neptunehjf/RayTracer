@@ -692,7 +692,7 @@ int main()
     // 开始计时
     time(&start_time);
 
-    switch (18)
+    switch (7)
     {
     case 1:
         scene_bouncing_spheres();

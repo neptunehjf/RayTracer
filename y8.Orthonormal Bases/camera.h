@@ -161,6 +161,7 @@ private:
         {
             ray ray_out;
             color attenuation;
+            double sample_pdf;
 
             // 以下分支，光源材质和弹射材质是互斥的，因此逻辑简单清晰。
             // 以后有可能会同时支持两种特性的材质，暂时先放着吧
@@ -169,13 +170,13 @@ private:
             // 光栅化无法自然做到，只能额外用公式来模拟光源衰减
             // 
             // 如果当前交点有弹射，说明是非光源材质，非光源材质只需返回弹射颜色
-            if (rec.mat->scatter(r, rec, attenuation, ray_out))
+            if (rec.mat->scatter(r, rec, attenuation, ray_out, sample_pdf))
             {
                 total_bounce++;
                 double scatter_pdf = rec.mat->scatter_pdf(r, rec, ray_out);
                 // sample_pdf和scatter_pdf完全一样，则实际没进行重要性采样，只是形式变成了重要性采样
                 // 把sample_pdf设成scatter_pdf，debug时可以排除采样的干扰，判断收敛目标(散射函数)本身是否有问题
-                double sample_pdf = scatter_pdf;
+                sample_pdf = scatter_pdf;
                 // 参照 referrence/Importance Sampling.png
                 return attenuation * ray_color(ray_out, scene, ++bounce_count) * 
                        scatter_pdf / sample_pdf;
