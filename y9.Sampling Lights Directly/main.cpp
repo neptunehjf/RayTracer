@@ -284,7 +284,7 @@ void scene_cornell_box()
 
     cam.aspect_radio = 1.0;
     cam.image_width = 600;
-    cam.sample_num = 1000;
+    cam.sample_num = 10;
     cam.bounce_limit = 50;
     cam.background = color(0, 0, 0);
 

@@ -159,9 +159,10 @@ private:
         interval ray_t(0.001, inf);
         if (scene.hit(r, ray_t, rec))
         {
-            ray ray_out;
+            ray scattered;
             color attenuation;
-            double sample_pdf;
+            double pdf_value;
+            color color_from_emission = rec.mat->emit(rec, rec.u, rec.v, rec.p);
 
             // 以下分支，光源材质和弹射材质是互斥的，因此逻辑简单清晰。
             // 以后有可能会同时支持两种特性的材质，暂时先放着吧
@@ -170,20 +171,44 @@ private:
             // 光栅化无法自然做到，只能额外用公式来模拟光源衰减
             // 
             // 如果当前交点有弹射，说明是非光源材质，非光源材质只需返回弹射颜色
-            if (rec.mat->scatter(r, rec, attenuation, ray_out, sample_pdf))
+            if (rec.mat->scatter(r, rec, attenuation, scattered, pdf_value))
             {
+                //dbg
                 total_bounce++;
-                double scatter_pdf = rec.mat->scatter_pdf(r, rec, ray_out);
+
+                // 参照referrence/PDF of a Light.png
+                point3 on_light = point3(random_double(213, 343), 554, random_double(227, 332));
+                vec3 to_light = on_light - rec.p;
+                double distance_squared = to_light.length_squared();
+                to_light = unit_vector(to_light);
+
+                if (dot(to_light, rec.normal) < 0)
+                    return color_from_emission;
+
+                double light_area = (343 - 213) * (332 - 227);
+                double light_cosine = fabs(to_light.y());
+                if (light_cosine < 0.000001)
+                    return color_from_emission;
+
+                // 计算出的pdf就是ray指向光源的pdf，用于加权
+                double sample_pdf = distance_squared / (light_cosine * light_area);
+                // 重要性采样，使散射方向指向光源的
+                scattered = ray(rec.p, to_light, r.time());
+
+                double scatter_pdf = rec.mat->scatter_pdf(r, rec, scattered);
+
                 // sample_pdf和scatter_pdf完全一样，则实际没进行重要性采样，只是形式变成了重要性采样
                 // 把sample_pdf设成scatter_pdf，debug时可以排除采样的干扰，判断收敛目标(散射函数)本身是否有问题
-                sample_pdf = scatter_pdf;
+                //sample_pdf = scatter_pdf;
+                
                 // 参照 referrence/Importance Sampling.png
-                return attenuation * ray_color(ray_out, scene, ++bounce_count) * 
-                       scatter_pdf / sample_pdf;
+                color color_from_scatter = attenuation * ray_color(scattered, scene, ++bounce_count) *
+                                           scatter_pdf / sample_pdf;
+                return color_from_scatter;
             }
             // 如果当前交点在光源材质，则只需返回光源颜色
             else
-                return rec.mat->emit(rec.u, rec.v, rec.p);
+                return color_from_emission;
         }
 
         // 什么都没击中，返回背景色

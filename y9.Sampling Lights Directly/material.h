@@ -13,22 +13,22 @@ public:
 	// ray_in 入射光线
 	// rec 交点信息，包含了具体的材质类型
 	// attenuation 能量衰减(对于物体表面吸收的能量来说)，就是被反射能量比例
-	// ray_out 出射光线（散射光线）
+	// scatter 出射光线（散射光线）
 	virtual bool scatter(const ray& ray_in, const hit_record& rec,
-		                 color& attenuation, ray& ray_out, double& pdf) const
+		                 color& attenuation, ray& scatter, double& pdf) const
 	{
 		return false;
 	}
 
 	// 光源材质，默认不发光(黑色)
 	// 纯色光源一般用不到参数u,v,p，要实现一些特殊效果(比如带贴图的光源)的话可能会用到
-	virtual color emit(double u, double v, const point3& p) const
+	virtual color emit(const hit_record& rec, double u, double v, const point3& p) const
 	{
 		return color(0, 0, 0);
 	}
 
 	// 获取当前渲染的散射方向的pdf，也就是最终的收敛目标
-	virtual double scatter_pdf(const ray& ray_in, const hit_record& rec, const ray& ray_out) const
+	virtual double scatter_pdf(const ray& ray_in, const hit_record& rec, const ray& scatter) const
 	{
 		return 0;
 	}
@@ -41,7 +41,7 @@ public:
 	diffuse(shared_ptr<texture> tex) : tex(tex) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
-		color& attenuation, ray& ray_out, double& pdf) const override
+		color& attenuation, ray& scatter, double& pdf) const override
 	{
 		// 根据lambertian reflection模型算出的随机反射方向，和normal夹角越小，概率越大
 		// 参考referrence/lambertian reflection.png
@@ -57,18 +57,18 @@ public:
 			out_dir = rec.normal;
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
-		ray_out = ray(rec.p, out_dir, ray_in.time());
+		scatter = ray(rec.p, out_dir, ray_in.time());
 		attenuation = tex->value(rec.u, rec.v, rec.p);
-		pdf = dot(uvw.w(), ray_out.direction()) / pi;
+		pdf = dot(uvw.w(), scatter.direction()) / pi;
 
 		return true;
 	}
 
 	// 获取当前渲染的散射方向的pdf，也就是最终的收敛目标
 	// 参照 referrence/Lambertian Scatter PDF.jpg
-	double scatter_pdf(const ray& ray_in, const hit_record& rec, const ray& ray_out) const override
+	double scatter_pdf(const ray& ray_in, const hit_record& rec, const ray& scatter) const override
 	{
-		double cos_theta = dot(rec.normal, unit_vector(ray_out.direction()));
+		double cos_theta = dot(rec.normal, unit_vector(scatter.direction()));
 		return cos_theta < 0 ? 0 : cos_theta / pi;
 	}
 
@@ -82,7 +82,7 @@ public:
 	metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1.0 ? fuzz : 1.0) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
-		color& attenuation, ray& ray_out, double& pdf) const override
+		color& attenuation, ray& scatter, double& pdf) const override
 	{
 		vec3 out_dir = reflect(ray_in.direction(), rec.normal);
 		// fuzz:金属反射后再进行一次方向随机，使金属看起来有磨砂效果
@@ -91,7 +91,7 @@ public:
 		out_dir = unit_vector(out_dir) + fuzz * random_unit_vector();
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
-		ray_out = ray(rec.p, out_dir, ray_in.time());
+		scatter = ray(rec.p, out_dir, ray_in.time());
 		attenuation = albedo;
 
 		return true;
@@ -108,7 +108,7 @@ public:
 	dielectric(double refraction_index) : refraction_index(refraction_index) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
-		color& attenuation, ray& ray_out, double& pdf) const override
+		color& attenuation, ray& scatter, double& pdf) const override
 	{
 		double ri = rec.front_face ? (1.0 / refraction_index) : refraction_index;
 
@@ -132,7 +132,7 @@ public:
 		}
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
-		ray_out = ray(rec.p, out_dir, ray_in.time());
+		scatter = ray(rec.p, out_dir, ray_in.time());
 
 		// 不吸收能量，全部反射或者折射
 		attenuation = color(1.0, 1.0, 1.0); 
@@ -161,8 +161,10 @@ public:
 	diffuse_light(const color& light_color) : tex(make_shared<solid_color>(light_color)) {}
 	diffuse_light(shared_ptr<texture> tex) : tex(tex) {}
 
-	color emit(double u, double v, const point3& p) const override
+	color emit(const hit_record& rec, double u, double v, const point3& p) const override
 	{
+		if (!rec.front_face)
+			return color(0, 0, 0);
 		return tex->value(u, v, p);
 	}
 
@@ -179,15 +181,15 @@ public:
 	isotropic(shared_ptr<texture> tex) : tex(tex) {}
 
 	bool scatter(const ray& ray_in, const hit_record& rec,
-		         color& attenuation, ray& ray_out, double& pdf) const override
+		         color& attenuation, ray& scatter, double& pdf) const override
 	{
-		ray_out = ray(rec.p, random_unit_vector(), ray_in.time());
+		scatter = ray(rec.p, random_unit_vector(), ray_in.time());
 		attenuation = tex->value(rec.u, rec.v, rec.p);
 		pdf = 1 / (4 * pi);
 		return true;
 	}
 
-	double scatter_pdf(const ray& ray_in, const hit_record& rec, const ray& ray_out) const override
+	double scatter_pdf(const ray& ray_in, const hit_record& rec, const ray& scatter) const override
 	{
 		return 1 / (4 * pi);
 	}
