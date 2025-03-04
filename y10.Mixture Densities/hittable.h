@@ -51,6 +51,20 @@ public:
 
 	// 返回物体的包围盒
 	virtual aabb bounding_box() const = 0;
+
+	// 返回以origin为起点到当前物体的随机向量
+	virtual vec3 random(const point3& origin) const
+	{
+		return vec3(1, 0, 0);
+	}
+
+	// 返回random生成的随机向量的pdf值
+	virtual double pdf_value(const point3& origin, const vec3& direction) const 
+	{
+		return 0.0;
+	}
+
+
 };
 
 // 平移类，用于物体的平移

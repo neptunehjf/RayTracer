@@ -54,3 +54,52 @@ public:
 private:
 	onb uvw;
 };
+
+class hittable_pdf : public pdf 
+{
+public:
+	hittable_pdf(const hittable& objects, const point3& origin)
+		: objects(objects), origin(origin)
+	{}
+
+	vec3 generate() const override 
+	{
+		return objects.random(origin);
+	}
+
+	double value(const vec3& direction) const override 
+	{
+		return objects.pdf_value(origin, direction);
+	}
+
+private:
+	const hittable& objects;
+	point3 origin;
+};
+
+// 混合密度pdf，对不同pdf加权，加权总和要等于1
+class mixture_pdf : public pdf 
+{
+public:
+	mixture_pdf(shared_ptr<pdf> p0, shared_ptr<pdf> p1) 
+	{
+		p[0] = p0;
+		p[1] = p1;
+	}
+
+	vec3 generate() const override
+	{
+		if (random_double() < 0.5)
+			return p[0]->generate();
+		else
+			return p[1]->generate();
+	}
+
+	double value(const vec3& direction) const override 
+	{
+		return 0.5 * p[0]->value(direction) + 0.5 * p[1]->value(direction);
+	}
+
+private:
+	shared_ptr<pdf> p[2];
+};

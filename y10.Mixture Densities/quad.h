@@ -23,6 +23,9 @@ public:
 		// 参照 referrence/ray-quad-intersection.jpg ③
 		// 注意w的法线要用未归一化的，因为n = cross(u, v);
 		w = n / dot(n, n);
+
+		// 叉乘向量的长度等于面积
+		area = n.length();
 	}
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override
@@ -67,6 +70,26 @@ public:
 		return bbox;
 	}
 
+	// 参照referrence/PDF of a Light.png
+	double pdf_value(const point3& origin, const vec3& direction) const override 
+	{
+		hit_record rec;
+		if (!this->hit(ray(origin, direction), interval(0.001, inf), rec))
+			return 0;
+
+		double distance_squared = rec.t * rec.t * direction.length_squared();
+		double cosine = fabs(dot(direction, rec.normal) / direction.length());
+
+		return distance_squared / (cosine * area);
+	}
+
+	vec3 random(const point3& origin) const override 
+	{
+		// 光线射向物体表面随机的一个点
+		point3 p = Q + (random_double() * u) + (random_double() * v);
+		return p - origin;
+	}
+
 private:
 	// Q,u,v决定了一个四边形
 	point3 Q;  // 四边形起始点
@@ -76,6 +99,7 @@ private:
 	vec3 normal; // 法线
 	double D; // D值
 	vec3 w; //临时向量，用于简化计算
+	double area; //面积
 
 	bool is_inside(double alpha, double beta, hit_record& rec) const
 	{
