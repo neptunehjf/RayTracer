@@ -2,6 +2,7 @@
 
 #include "common.h"
 
+// 正交归一基
 class onb
 {
 public:

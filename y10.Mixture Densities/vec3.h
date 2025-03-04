@@ -199,7 +199,7 @@ inline vec3 refract(const vec3& unit_v, const vec3& uint_n, double ri)
 	return out_perp + out_para;
 }
 
-// 基于z轴生成一个随机变量
+// 基于与z轴夹角生成一个随机向量
 // 参照referrence/cos_cube_cos_sample.png 
 inline vec3 random_cosine_direction() 
 {
@@ -207,9 +207,9 @@ inline vec3 random_cosine_direction()
 	auto r2 = random_double();
 
 	auto phi = 2 * pi * r1;
-	auto x = std::cos(phi) * std::sqrt(r2);
-	auto y = std::sin(phi) * std::sqrt(r2);
-	auto z = std::sqrt(1 - r2);
+	auto x = cos(phi) * sqrt(r2);
+	auto y = sin(phi) * sqrt(r2);
+	auto z = sqrt(1 - r2);
 
 	return vec3(x, y, z);
 }

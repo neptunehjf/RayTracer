@@ -4,6 +4,7 @@
 #include "hittable_list.h"
 #include "material.h"
 #include "dbg.h"
+#include "pdf.h"
 
 class camera
 {
@@ -177,34 +178,40 @@ private:
                 total_bounce++;
 
                 // 参照referrence/PDF of a Light.png
-                point3 on_light = point3(random_double(213, 343), 554, random_double(227, 332));
-                vec3 to_light = on_light - rec.p;
-                double distance_squared = to_light.length_squared();
-                to_light = unit_vector(to_light);
+                //point3 on_light = point3(random_double(213, 343), 554, random_double(227, 332));
+                //vec3 to_light = on_light - rec.p;
+                //double distance_squared = to_light.length_squared();
+                //to_light = unit_vector(to_light);
 
-                if (dot(to_light, rec.normal) < 0)
-                    return color_from_emission;
+                //if (dot(to_light, rec.normal) < 0)
+                //    return color_from_emission;
 
-                double light_area = (343 - 213) * (332 - 227);
-                double light_cosine = fabs(to_light.y());
-                if (light_cosine < 0.000001)
-                    return color_from_emission;
+                //double light_area = (343 - 213) * (332 - 227);
+                //double light_cosine = fabs(to_light.y());
+                //if (light_cosine < 0.000001)
+                //    return color_from_emission;
 
-                // 计算出的pdf就是ray指向光源的pdf，用于加权
-                double sample_pdf = distance_squared / (light_cosine * light_area);
-                // 重要性采样，使散射方向指向光源的
-                scattered = ray(rec.p, to_light, r.time());
+                //// 计算出的pdf就是ray指向光源的pdf，用于加权
+                //double sample_pdf = distance_squared / (light_cosine * light_area);
+                //// 重要性采样，使散射方向指向光源的
+                //scattered = ray(rec.p, to_light, r.time());
 
-                double scatter_pdf = rec.mat->scatter_pdf(r, rec, scattered);
+                //double scatter_pdf = rec.mat->scatter_pdf(r, rec, scattered);
 
                 // sample_pdf和scatter_pdf完全一样，则实际没进行重要性采样，只是形式变成了重要性采样
                 // 把sample_pdf设成scatter_pdf，debug时可以排除采样的干扰，判断收敛目标(散射函数)本身是否有问题
                 //sample_pdf = scatter_pdf;
                 
+                
+                cosine_pdf pdf(rec.normal);
+                scattered = ray(rec.p, pdf.generate(), r.time());
+                pdf_value = pdf.value(scattered.direction());
+                double scatter_pdf = rec.mat->scatter_pdf(r, rec, scattered);
+
                 // 参照 referrence/Importance Sampling.png
                 color color_from_scatter = attenuation * ray_color(scattered, scene, ++bounce_count) *
-                                           scatter_pdf / sample_pdf;
-                return color_from_scatter;
+                                           scatter_pdf / pdf_value;
+                return color_from_scatter + color_from_emission;
             }
             // 如果当前交点在光源材质，则只需返回光源颜色
             else
