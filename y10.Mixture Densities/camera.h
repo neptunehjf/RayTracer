@@ -177,6 +177,7 @@ private:
                 //dbg
                 total_bounce++;
                 
+                // 合理使用混合密度pdf，要比单独使用pdf降噪效果更好
                 auto p0 = make_shared<hittable_pdf>(lights, rec.p);
                 auto p1 = make_shared<cosine_pdf>(rec.normal);
                 mixture_pdf mixed_pdf(p0, p1);
