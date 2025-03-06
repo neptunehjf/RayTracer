@@ -2,7 +2,18 @@
 
 #include "hittable.h"
 #include "texture.h"
-#include "onb.h"
+#include "pdf.h"
+
+// 管理散射相关数据
+class scatter_record
+{
+public:
+	color attenuation; // 散射衰减，表示散射后留下的能量(颜色)
+	shared_ptr<pdf> pdf_ptr; // pdf指针，管理了散射的随机方向和对应的pdf值
+	bool no_pdf;    // 无pdf标志位，适用镜面反射，折射等散射方向固定的情况
+	ray no_pdf_ray; // 镜面反射，折射等的固定散射方向
+};
+
 
 class material
 {
@@ -14,8 +25,7 @@ public:
 	// rec 交点信息，包含了具体的材质类型
 	// attenuation 能量衰减(对于物体表面吸收的能量来说)，就是被反射能量比例
 	// scatter 出射光线（散射光线）
-	virtual bool scatter(const ray& ray_in, const hit_record& rec,
-		                 color& attenuation, ray& scatter, double& pdf) const
+	virtual bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const
 	{
 		return false;
 	}
@@ -40,8 +50,7 @@ public:
 	diffuse(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
 	diffuse(shared_ptr<texture> tex) : tex(tex) {}
 
-	bool scatter(const ray& ray_in, const hit_record& rec,
-		color& attenuation, ray& scatter, double& pdf) const override
+	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override
 	{
 		// 根据lambertian reflection模型算出的随机反射方向，和normal夹角越小，概率越大
 		// 参考referrence/lambertian reflection.png
@@ -49,17 +58,17 @@ public:
 
 		// 先根据z轴生成随机向量，再把坐标系转成法线作为z轴的坐标空间(切线坐标)
 		// 参考referrence/lambertian reflection.png
-		onb uvw(rec.normal);
-		vec3 out_dir = uvw.transform(random_cosine_direction());
+		//onb uvw(rec.normal);
+		//vec3 out_dir = uvw.transform(random_cosine_direction());
 
 		//防止dir是0向量的情况
-		if (out_dir.near_zero())
-			out_dir = rec.normal;
+		//if (out_dir.near_zero())
+		//	out_dir = rec.normal;
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
-		scatter = ray(rec.p, out_dir, ray_in.time());
-		attenuation = tex->value(rec.u, rec.v, rec.p);
-		pdf = dot(uvw.w(), scatter.direction()) / pi;
+		srec.attenuation = tex->value(rec.u, rec.v, rec.p);
+		srec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
+		srec.no_pdf = false;
 
 		return true;
 	}
@@ -81,8 +90,7 @@ class metal : public material
 public:
 	metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1.0 ? fuzz : 1.0) {}
 
-	bool scatter(const ray& ray_in, const hit_record& rec,
-		color& attenuation, ray& scatter, double& pdf) const override
+	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override
 	{
 		vec3 out_dir = reflect(ray_in.direction(), rec.normal);
 		// fuzz:金属反射后再进行一次方向随机，使金属看起来有磨砂效果
@@ -91,8 +99,10 @@ public:
 		out_dir = unit_vector(out_dir) + fuzz * random_unit_vector();
 
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
-		scatter = ray(rec.p, out_dir, ray_in.time());
-		attenuation = albedo;
+		srec.attenuation = albedo;
+		srec.pdf_ptr = nullptr;
+		srec.no_pdf = true;
+		srec.no_pdf_ray = ray(rec.p, out_dir, ray_in.time());
 
 		return true;
 	}
@@ -107,8 +117,7 @@ class dielectric : public material
 public:
 	dielectric(double refraction_index) : refraction_index(refraction_index) {}
 
-	bool scatter(const ray& ray_in, const hit_record& rec,
-		color& attenuation, ray& scatter, double& pdf) const override
+	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override
 	{
 		double ri = rec.front_face ? (1.0 / refraction_index) : refraction_index;
 
@@ -131,11 +140,11 @@ public:
 			out_dir = refract(unit_v, rec.normal, ri);
 		}
 
+		srec.attenuation = color(1.0, 1.0, 1.0); // 不吸收能量，全部折射
+		srec.pdf_ptr = nullptr;
+		srec.no_pdf = true;
 		// 因为物体运动的宏观时间远大于光线传播的微观时间，所以time保持不变即可
-		scatter = ray(rec.p, out_dir, ray_in.time());
-
-		// 不吸收能量，全部反射或者折射
-		attenuation = color(1.0, 1.0, 1.0); 
+		srec.no_pdf_ray = ray(rec.p, out_dir, ray_in.time());
 
 		return true;
 	}
@@ -180,12 +189,11 @@ public:
 	isotropic(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
 	isotropic(shared_ptr<texture> tex) : tex(tex) {}
 
-	bool scatter(const ray& ray_in, const hit_record& rec,
-		         color& attenuation, ray& scatter, double& pdf) const override
+	bool scatter(const ray& ray_in, const hit_record& rec, scatter_record& srec) const override 
 	{
-		scatter = ray(rec.p, random_unit_vector(), ray_in.time());
-		attenuation = tex->value(rec.u, rec.v, rec.p);
-		pdf = 1 / (4 * pi);
+		srec.attenuation = tex->value(rec.u, rec.v, rec.p);
+		srec.pdf_ptr = make_shared<sphere_pdf>();
+		srec.no_pdf = false;
 		return true;
 	}
 

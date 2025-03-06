@@ -160,10 +160,8 @@ private:
         interval ray_t(0.001, inf);
         if (scene.hit(r, ray_t, rec))
         {
-            ray scattered;
-            color attenuation;
-            double pdf_value;
             color color_from_emission = rec.mat->emit(rec, rec.u, rec.v, rec.p);
+            scatter_record srec;
 
             // 以下分支，光源材质和弹射材质是互斥的，因此逻辑简单清晰。
             // 以后有可能会同时支持两种特性的材质，暂时先放着吧
@@ -172,23 +170,27 @@ private:
             // 光栅化无法自然做到，只能额外用公式来模拟光源衰减
             // 
             // 如果当前交点有弹射，说明是非光源材质，非光源材质只需返回弹射颜色
-            if (rec.mat->scatter(r, rec, attenuation, scattered, pdf_value))
+            if (rec.mat->scatter(r, rec, srec))
             {
                 //dbg
                 total_bounce++;
+
+                if (srec.no_pdf) 
+                {
+                    return srec.attenuation * ray_color(srec.no_pdf_ray, scene, ++bounce_count, lights);
+                }
                 
                 // 合理使用混合密度pdf，要比单独使用pdf降噪效果更好
-                auto p0 = make_shared<hittable_pdf>(lights, rec.p);
-                auto p1 = make_shared<cosine_pdf>(rec.normal);
-                mixture_pdf mixed_pdf(p0, p1);
+                auto light_ptr = make_shared<hittable_pdf>(lights, rec.p);
+                mixture_pdf p(light_ptr, srec.pdf_ptr);
 
-                scattered = ray(rec.p, mixed_pdf.generate(), r.time());
-                pdf_value = mixed_pdf.value(scattered.direction());
+                ray scattered = ray(rec.p, p.generate(), r.time());
+                double pdf_value = p.value(scattered.direction());
 
                 double scatter_pdf = rec.mat->scatter_pdf(r, rec, scattered);
 
                 // 参照 referrence/Importance Sampling.png
-                color color_from_scatter = attenuation * ray_color(scattered, scene, ++bounce_count, lights) *
+                color color_from_scatter = srec.attenuation * ray_color(scattered, scene, ++bounce_count, lights) *
                                            scatter_pdf / pdf_value;
                 return color_from_scatter;
             }

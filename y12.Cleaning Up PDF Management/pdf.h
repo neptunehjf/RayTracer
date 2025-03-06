@@ -41,6 +41,8 @@ public:
 
 	vec3 generate() const override
 	{
+		// 先根据z轴生成随机向量，再把坐标系转成法线作为z轴的坐标空间(切线坐标)
+		// 参考referrence/lambertian reflection.png
 		return uvw.transform(random_cosine_direction());
 	}
 
