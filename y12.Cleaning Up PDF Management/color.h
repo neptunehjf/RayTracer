@@ -20,9 +20,19 @@ double linear_to_gamma(double color_componet)
 // 写一个颜色值到out
 void write_color(ostream& out, const color& c)
 {
-	double r = linear_to_gamma(c.x());
-	double g = linear_to_gamma(c.y());
-	double b = linear_to_gamma(c.z());
+	double r = c.x();
+	double g = c.y();
+	double b = c.z();
+
+	// 消除acne 值是NaN的情况下视为0
+	if (r != r) r = 0.0;
+	if (g != g) g = 0.0;
+	if (b != b) b = 0.0;
+
+	// Gamma校正
+	r = linear_to_gamma(r);
+	g = linear_to_gamma(g);
+	b = linear_to_gamma(b);
 
 	// 这里最大值0.999是为了避免结果256导致的溢出(单字节颜色)
 	const interval range(0.000, 0.999); 
