@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "hittable.h"
+#include "onb.h"
 
 class sphere : public hittable
 {
@@ -81,6 +82,31 @@ public:
         return bbox;
     }
 
+    // 参照referrence/samples_a_sphere.jpg 的②
+    double pdf_value(const point3& origin, const vec3& direction) const override 
+    {
+        // 目前只支持静态球
+
+        hit_record rec;
+        if (!this->hit(ray(origin, direction), interval(0.001, inf), rec))
+            return 0;
+
+        double dist_squared = (center.at(0) - origin).length_squared();
+        double cos_theta_max = std::sqrt(1 - radius * radius / dist_squared);
+        double solid_angle = 2 * pi * (1 - cos_theta_max);
+
+        return  1 / solid_angle;
+    }
+
+    vec3 random(const point3& origin) const override 
+    {
+        vec3 direction = center.at(0) - origin;
+        double distance_squared = direction.length_squared();
+        onb uvw(direction);
+        // 切线空间转世界空间
+        return uvw.transform(random_to_sphere(radius, distance_squared));
+    }
+
 private:
 	ray center;  // 球心，以及可能的运动方向。方向的向量不能normalize，因为要用不同的向量长度来表现不同物体的不同速度
     double radius;  // 半径
@@ -97,5 +123,19 @@ private:
         // 球面坐标 =》UV坐标
         u = phi / (2 * pi);
         v = theta / pi;
+    }
+
+    // 参照referrence/samples_a_sphere.jpg 的①
+    static vec3 random_to_sphere(double radius, double distance_squared) 
+    {
+        double r1 = random_double();
+        double r2 = random_double();
+        double z = 1 + r2 * (sqrt(1 - radius * radius / distance_squared) - 1);
+
+        double phi = 2 * pi * r1;
+        double x = cos(phi) * sqrt(1 - z * z);
+        double y = sin(phi) * sqrt(1 - z * z);
+
+        return vec3(x, y, z);
     }
 };
