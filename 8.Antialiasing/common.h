@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <iostream>
 #include <limits>
@@ -22,7 +22,8 @@ inline double degree_to_radian(double degree)
 
 inline double random_double()
 {
-	// ÕâÀïÈ«¾ÖÖ»Ğè1¸öÖÖ×Ó£¬1¸öÎ±Ëæ»úÊıÁĞ£¬Òò´Ë¼ÓstaticĞŞÊÎ       
+	// è¿™é‡Œå…¨å±€åªéœ€1ä¸ªç§å­ï¼Œ1ä¸ªä¼ªéšæœºæ•°åˆ—ï¼Œå› æ­¤åŠ staticä¿®é¥°
+	// ã‚°ãƒ­ãƒ¼ãƒãƒ«ã§å˜ä¸€ã®ä¹±æ•°ç”Ÿæˆå™¨ã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚staticä¿®é£¾       
 	static uniform_real_distribution<double> distribution(0.0, 1.0);
 	static mt19937 generator;
 	return distribution(generator);
