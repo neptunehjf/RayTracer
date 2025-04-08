@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 
 using namespace std;
 
@@ -9,10 +9,10 @@ int main() {
 
     cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-    // Êä³ö256x256µÄÍ¼Æ¬£¬RÔÚË®Æ½·½ÏòÉÏµÝÔö£¬GÔÚ´¹Ö±·½ÏòÉÏµÝÔö£¬B±£³ÖÎª0.0
+    // 256x256ã®ç”»åƒã‚’ç”Ÿæˆï¼ˆRå€¤ã¯æ°´å¹³æ–¹å‘ã«å¢—åŠ ã€Gå€¤ã¯åž‚ç›´æ–¹å‘ã«å¢—åŠ ã€Bå€¤ã¯å¸¸ã«0ï¼‰
     for (int j = 0; j < image_height; j++) // G
     {
-        // ÏÔÊ¾½ø¶È
+        // é€²æ—çŠ¶æ³ã‚’è¡¨ç¤º
         clog << "\rScanlines remaining: " << (image_height - j) << ' ' << flush;
 
         for (int i = 0; i < image_width; i++) // R
@@ -21,12 +21,12 @@ int main() {
             double g = (double)j / (double)(image_height - 1);
             double b = 0.0;
 
-            // 0.0~1.0 ×ª³É 0~255
+            // 0.0ã€œ1.0ã®å€¤ã‚’0ã€œ255ã®æ•´æ•°ã«å¤‰æ›
             int ir = (int)(r * 255.999);
             int ig = (int)(g * 255.999);
             int ib = (int)(b * 255.999);
 
-            // ÅäÖÃÖØ¶¨Ïòµ½output.ppm£¬Ö±½ÓÓÃcoutÊä³ö¼´¿É
+            // ãƒ”ã‚¯ã‚»ãƒ«ãƒ‡ãƒ¼ã‚¿ã‚’å‡ºåŠ›ï¼ˆoutput.ppmã«ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆï¼‰
             cout << ir << ' ' << ig << ' ' << ib << '\n';
         }
     }

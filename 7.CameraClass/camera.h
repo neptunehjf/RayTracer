@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "common.h"
 #include "hittable_list.h"
@@ -9,7 +9,8 @@ public:
 	double aspect_radio = 1.0;
 	int image_width = 100;
 
-    // ¹â×·µÄäÖÈ¾ÊÇºÍcamera°ó¶¨µÄ£¬Òò´Ë°Ñrender·Åµ½cameraÀàÀï
+    // å…‰è¿½çš„æ¸²æŸ“æ˜¯å’Œcameraç»‘å®šçš„ï¼Œå› æ­¤æŠŠrenderæ”¾åˆ°cameraç±»é‡Œ
+    // ãƒ¬ã‚¤ãƒˆãƒ¬ãƒ¼ã‚·ãƒ³ã‚°ã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã¯ã‚«ãƒ¡ãƒ©ã¨å¯†æ¥ã«ç´ä»˜ã„ã¦ã„ã‚‹ãŸã‚ã€Cameraã‚¯ãƒ©ã‚¹å†…ã«ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ãƒ¡ã‚½ãƒƒãƒ‰ã‚’å®Ÿè£…ã™ã‚‹
 	void render(const hittable_list& scene)
 	{
 		initialize();
@@ -18,17 +19,18 @@ public:
 
         for (int j = 0; j < image_height; j++)
         {
-            // ÏÔÊ¾½ø¶È
+            // é€²æ—çŠ¶æ³ã‚’è¡¨ç¤º
             clog << "\rScanlines remaining: " << (image_height - j) << ' ' << flush;
 
             for (int i = 0; i < image_width; i++)
             {
-                // Çó³öÃ¿Ò»¸öcameraµ½ÏñËØÖĞĞÄµÄÉäÏß
+                // æ±‚å‡ºæ¯ä¸€ä¸ªcameraåˆ°åƒç´ ä¸­å¿ƒçš„å°„çº¿
+				// ãƒ”ã‚¯ã‚»ãƒ«ä¸­å¿ƒã¸ã®rayã‚’è¨ˆç®—
                 point3 pixel = pixel_zero + vec3(i * pixel_x, j * pixel_y, 0.0);
                 vec3 ray_dir = pixel - cam_pos;
                 ray r(cam_pos, ray_dir);
 
-                // ¸ù¾İrayËã³öcolor
+                // rayã«ã‚ˆã‚‹è‰²è¨ˆç®—
                 color pixel_color = ray_color(r, scene);
                 write_color(cout, pixel_color);
             }
@@ -45,48 +47,51 @@ private:
 
 	void initialize()
 	{
-        image_height = (int)(image_width / aspect_radio); // ÒòÎªÊÇ½üËÆ¼ÆËã£¬ÓĞ¿ÉÄÜÊÇ0
-        image_height = (image_height < 1) ? 1 : image_height;  // ±£Ö¤²»Ğ¡ÓÚ1
+        image_height = (int)(image_width / aspect_radio); // è¿‘ä¼¼è¨ˆç®—ã®ãŸã‚0ã«ãªã‚‹å¯èƒ½æ€§ã‚ã‚Š
+        image_height = (image_height < 1) ? 1 : image_height;  // æœ€å°1ã‚’ä¿è¨¼
         cam_pos = point3(0.0, 0.0, 0.0);
 
-        double focal_length = 1.0; // ½¹¾à£¬cameraºÍviewportÖ®¼äµÄ¾àÀë£¬Ä¿Ç°¶¨Îª1.0
+        double focal_length = 1.0; // ç„¦ç‚¹è·é›¢ï¼ˆcameraã¨viewporté–“ã®è·é›¢ï¼‰
         double viewport_h = 2.0;
-        double viewport_w = viewport_h * (double(image_width) / image_height); // ÒòÎªimage_heightÊÇ½üËÆ¼ÆËãµÄ£¬²»ÄÜÖ±½ÓÓÃaspect_radio
+        double viewport_w = viewport_h * (double(image_width) / image_height); // è¿‘ä¼¼å€¤ã®ãŸã‚ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’ç›´æ¥ä½¿ç”¨ä¸å¯
 
-        // viewport UV ÔÚcamera×ø±êÏµµÄÏòÁ¿
+       // ã‚«ãƒ¡ãƒ©åº§æ¨™ç³»ã«ãŠã‘ã‚‹viewport UV
         vec3 u = vec3(viewport_w, 0.0, 0.0);
-        vec3 v = vec3(0.0, -viewport_h, 0.0); // ÒòÎªviewportµÄËùÔÚµÄv·½ÏòºÍcamera×ø±êÏµy·½ÏòÏà·´
+        vec3 v = vec3(0.0, -viewport_h, 0.0); // å› ä¸ºviewportçš„æ‰€åœ¨çš„væ–¹å‘å’Œcameraåæ ‡ç³»yæ–¹å‘ç›¸å
 
-        // »»Ëã³ÉÃ¿¸öpixel¶ÔÓ¦µÄuv´óĞ¡
+       // ãƒ”ã‚¯ã‚»ãƒ«å˜ä½ã®UVã‚µã‚¤ã‚ºã«æ›ç®—
         pixel_x = viewport_w / image_width;
         pixel_y = -viewport_h / image_height;
 
-        // ¼ÆËãviewportÔ­µãÔÚcamera×ø±êÏµµÄÎ»ÖÃ£¬viewportÔ­µãÔÚ×óÉÏ½Ç£¬ÀëÏà»ú¾àÀëfocal_length£¬ÔÚxyÆ½Ãæ£¬Ïà»úÎ»ÖÃºÍviewportÖĞĞÄÖØºÏ
+       // è®¡ç®—viewportåŸç‚¹åœ¨cameraåæ ‡ç³»çš„ä½ç½®ï¼ŒviewportåŸç‚¹åœ¨å·¦ä¸Šè§’ï¼Œç¦»ç›¸æœºè·ç¦»focal_lengthï¼Œåœ¨xyå¹³é¢ï¼Œç›¸æœºä½ç½®å’Œviewportä¸­å¿ƒé‡åˆ
+       // ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆåŸç‚¹ã®ä½ç½®ã‚’è¨ˆç®—ï¼ˆå·¦ä¸Šéš…ã«é…ç½®ã€ç„¦ç‚¹è·é›¢åˆ†é›¢ã‚ŒãŸXYå¹³é¢ä¸Šã€ã‚«ãƒ¡ãƒ©ä½ç½®ã¯ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆä¸­å¿ƒã¨ä¸€è‡´ï¼‰
         point3 viewport_zero = cam_pos - vec3(0.0, 0.0, focal_length) - u / 2 - v / 2;
-        // ×ªÎªÏñËØµÄÖĞĞÄ×ø±ê
+		
+       // è½¬ä¸ºåƒç´ çš„ä¸­å¿ƒåæ ‡
+       // ãƒ”ã‚¯ã‚»ãƒ«ä¸­å¿ƒåº§æ¨™ã¸ã®èª¿æ•´
         pixel_zero = viewport_zero + vec3(0.5 * pixel_x, 0.5 * pixel_y, 0.0);
 	}
 
-    // ¼ÆËã¹âÏßµÄÑÕÉ«
+    // rayã®è‰²è¨ˆç®—é–¢æ•°
     color ray_color(const ray& r, const hittable_list& scene)
     {
-        // ·µ»Ø¹âÏßÓëÎïÌå½»µãµÄ·¨Ïß
+        // å…‰ç·šã¨ç‰©ä½“ã®äº¤ç‚¹ã«ãŠã‘ã‚‹æ³•ç·šã‚’è¿”ã™
         hit_record rec;
         interval ray_t(0.0, inf);
         if (scene.hit(r, ray_t, rec))
         {
-            // ·¨ÏßÔÚ¼¸ºÎ½×¶Î(hit)ÒÑ¾­¼ÆËãºÃÁË
+            // æ³•ç·šã¯å¹¾ä½•å‡¦ç†æ®µéš(hit)ã§æ—¢ã«è¨ˆç®—æ¸ˆã¿
             // [-1.0, 1.0] ==> [0.0, 1.0]
             return 0.5 * (rec.normal + vec3(1.0, 1.0, 1.0));
         }
 
-        // ÒÔÏÂÎª±³¾°É«
-        // ¸ù¾İrµÄy·ÖÁ¿½øĞĞlerp
+        // èƒŒæ™¯è‰²ã®å‡¦ç†
+        // rayã®yæˆåˆ†ã«ã‚ˆã‚‹ç·šå½¢è£œé–“
         vec3 r_uint = unit_vector(r.direction());
         // [-1.0, 1.0] ==> [0.0, 1.0]
         double a = 0.5 * (r_uint.y() + 1.0);
 
-        // ·µ»ØÀ¶É«Óë°×É«Ö®¼äµÄlerp
+       // é’ã¨ç™½ã®ã‚°ãƒ©ãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
         return (1 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
     }
 };

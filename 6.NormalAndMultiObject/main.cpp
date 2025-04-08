@@ -1,4 +1,4 @@
-#include "common.h"
+ï»¿#include "common.h"
 #include "hittable_list.h"
 #include "sphere.h"
 
@@ -7,55 +7,63 @@ double hit_sphere(const point3& center, double radius, const ray& r);
 
 int main() {
 
-    // Image ¹Ì¶¨¿í¸ß±ÈÎª16 : 9 
+    // ç”»åƒã®ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”16:9ã‚’å›ºå®š
     double aspect_radio = 16.0 / 9.0;
     int image_width = 400;
-    int image_height = (int) (image_width / aspect_radio); // ÒòÎªÊÇ½üËÆ¼ÆËã£¬ÓĞ¿ÉÄÜÊÇ0
-    image_height = (image_height < 1) ? 1 : image_height;  // ±£Ö¤²»Ğ¡ÓÚ1
+    int image_height = (int) (image_width / aspect_radio); // è¿‘ä¼¼è¨ˆç®—ã®ãŸã‚0ã«ãªã‚‹å¯èƒ½æ€§ã‚ã‚Š
+    image_height = (image_height < 1) ? 1 : image_height;  // æœ€å°1ã‚’ä¿è¨¼
 
     // Scene
     hittable_list scene;
 
-    // ×¢ÒâÕâÀïpoint3(0.0, 0.0, -1.0)ÊÇÓÒÖµ
-    // ËùÒÔsphere¹¹Ôìº¯ÊıµÄÈë²ÎÒªÃ´ÊÇconst point3&£¬ÒªÃ´ÊÇpoint&&£¬·ñÔò±àÒë±¨´í
+    // æ³¨æ„è¿™é‡Œpoint3(0.0, 0.0, -1.0)æ˜¯å³å€¼
+    // æ‰€ä»¥sphereæ„é€ å‡½æ•°çš„å…¥å‚è¦ä¹ˆæ˜¯const point3&ï¼Œè¦ä¹ˆæ˜¯point&&ï¼Œå¦åˆ™ç¼–è¯‘æŠ¥é”™
+    //
+    // 1. ã“ã“ã§ä½¿ç”¨ã•ã‚Œã¦ã„ã‚‹point3(0.0, 0.0, -1.0)ã¯å³è¾ºå€¤ï¼ˆrvalueï¼‰ã§ã™
+    // 2. ã—ãŸãŒã£ã¦sphereã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã®å¼•æ•°ã¯ã€const point3& ã¾ãŸã¯ point3&& ã§å®£è¨€ã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™
+    //    ï¼ˆã“ã‚Œã‚‰ä»¥å¤–ã®å½¢å¼ã§ã¯å³è¾ºå€¤ã®ãƒã‚¤ãƒ³ãƒ‰ãŒä¸å¯èƒ½ã¨ãªã‚Šã€ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã™ï¼‰
     scene.add(make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5));
     scene.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0));
 
     // Camera
     vec3 cam_pos = { 0.0, 0.0, 0.0 };
-    double focal_length = 1.0; // ½¹¾à£¬cameraºÍviewportÖ®¼äµÄ¾àÀë£¬Ä¿Ç°¶¨Îª1.0
+    double focal_length = 1.0; // ç„¦ç‚¹è·é›¢ï¼ˆcameraã¨viewporté–“ã®è·é›¢ï¼‰
     double viewport_h = 2.0;
-    double viewport_w = viewport_h * (double(image_width) / image_height); // ÒòÎªimage_heightÊÇ½üËÆ¼ÆËãµÄ£¬²»ÄÜÖ±½ÓÓÃaspect_radio
+    double viewport_w = viewport_h * (double(image_width) / image_height);  // è¿‘ä¼¼å€¤ã®ãŸã‚ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’ç›´æ¥ä½¿ç”¨ä¸å¯
 
-    // viewport UV ÔÚcamera×ø±êÏµµÄÏòÁ¿
+    // ã‚«ãƒ¡ãƒ©åº§æ¨™ç³»ã«ãŠã‘ã‚‹viewport UV
     vec3 u = vec3(viewport_w, 0.0, 0.0);
-    vec3 v = vec3(0.0, -viewport_h, 0.0); // ÒòÎªviewportµÄËùÔÚµÄv·½ÏòºÍcamera×ø±êÏµy·½ÏòÏà·´
+    vec3 v = vec3(0.0, -viewport_h, 0.0); // viewportã®væ–¹å‘ã¯ã‚«ãƒ¡ãƒ©åº§æ¨™ç³»ã®yè»¸ã¨é€†æ–¹å‘
 
-    // »»Ëã³ÉÃ¿¸öpixel¶ÔÓ¦µÄuv´óĞ¡
+    // ãƒ”ã‚¯ã‚»ãƒ«å˜ä½ã®UVã‚µã‚¤ã‚ºã«æ›ç®—
     double pixel_x = viewport_w / image_width;
     double pixel_y = -viewport_h / image_height;
 
-    // ¼ÆËãviewportÔ­µãÔÚcamera×ø±êÏµµÄÎ»ÖÃ£¬viewportÔ­µãÔÚ×óÉÏ½Ç£¬ÀëÏà»ú¾àÀëfocal_length£¬ÔÚxyÆ½Ãæ£¬Ïà»úÎ»ÖÃºÍviewportÖĞĞÄÖØºÏ
+    // è®¡ç®—viewportåŸç‚¹åœ¨cameraåæ ‡ç³»çš„ä½ç½®ï¼ŒviewportåŸç‚¹åœ¨å·¦ä¸Šè§’ï¼Œç¦»ç›¸æœºè·ç¦»focal_lengthï¼Œåœ¨xyå¹³é¢ï¼Œç›¸æœºä½ç½®å’Œviewportä¸­å¿ƒé‡åˆ
+    // ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆåŸç‚¹ã®ä½ç½®ã‚’è¨ˆç®—ï¼ˆå·¦ä¸Šéš…ã«é…ç½®ã€ç„¦ç‚¹è·é›¢åˆ†é›¢ã‚ŒãŸXYå¹³é¢ä¸Šã€ã‚«ãƒ¡ãƒ©ä½ç½®ã¯ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆä¸­å¿ƒã¨ä¸€è‡´ï¼‰
     point3 viewport_zero = cam_pos - vec3(0.0, 0.0, focal_length) - u / 2 - v / 2;
-    // ×ªÎªÏñËØµÄÖĞĞÄ×ø±ê
+
+    // è½¬ä¸ºåƒç´ çš„ä¸­å¿ƒåæ ‡
+    // ãƒ”ã‚¯ã‚»ãƒ«ä¸­å¿ƒåº§æ¨™ã¸ã®èª¿æ•´
     point3 pixel_zero = viewport_zero + vec3(0.5 * pixel_x, 0.5 * pixel_y, 0.0);
 
     cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-    // Êä³ö256x256µÄÍ¼Æ¬£¬RÔÚË®Æ½·½ÏòÉÏµİÔö£¬GÔÚ´¹Ö±·½ÏòÉÏµİÔö£¬B±£³ÖÎª0.0
+    // 256x256ã®ç”»åƒã‚’ç”Ÿæˆï¼ˆRå€¤ã¯æ°´å¹³æ–¹å‘ã«å¢—åŠ ã€Gå€¤ã¯å‚ç›´æ–¹å‘ã«å¢—åŠ ã€Bå€¤ã¯å¸¸ã«0ï¼‰
     for (int j = 0; j < image_height; j++) // G
     {
-        // ÏÔÊ¾½ø¶È
+        // é€²æ—çŠ¶æ³ã‚’è¡¨ç¤º
         clog << "\rScanlines remaining: " << (image_height - j) << ' ' << flush;
 
         for (int i = 0; i < image_width; i++) // R
         {
-            // Çó³öÃ¿Ò»¸öcameraµ½ÏñËØÖĞĞÄµÄÉäÏß
+            // æ±‚å‡ºæ¯ä¸€ä¸ªcameraåˆ°åƒç´ ä¸­å¿ƒçš„å°„çº¿
+            // ãƒ”ã‚¯ã‚»ãƒ«ä¸­å¿ƒã¸ã®rayã‚’è¨ˆç®—
             point3 pixel = pixel_zero + vec3(i * pixel_x, j * pixel_y, 0.0);
             vec3 ray_dir = pixel - cam_pos;
             ray r(cam_pos, ray_dir);
 
-            // ¸ù¾İrayËã³öcolor
+            // rayã«ã‚ˆã‚‹è‰²è¨ˆç®—
             color pixel_color = ray_color(r, scene);
             write_color(cout, pixel_color);
         }
@@ -63,53 +71,55 @@ int main() {
     clog << "\rDone.                 \n";
 }
 
-// ¼ÆËã¹âÏßµÄÑÕÉ«
+// rayã®è‰²è¨ˆç®—é–¢æ•°
 color ray_color(const ray& r, const hittable_list& scene)
 {
-    // Çò
+    // çƒ
     point3 center(0.0, 0.0, -1.0);
     double radius = 0.5;
 
-    // ·µ»Ø¹âÏßÓëÎïÌå½»µãµÄ·¨Ïß
+    // å…‰ç·šã¨ç‰©ä½“ã®äº¤ç‚¹ã«ãŠã‘ã‚‹æ³•ç·šã‚’è¿”ã™
     hit_record rec;
     interval ray_t(0.0, inf);
     if (scene.hit(r, ray_t, rec))
     {
-        // ·¨ÏßÔÚ¼¸ºÎ½×¶Î(hit)ÒÑ¾­¼ÆËãºÃÁË
+        // æ³•ç·šã¯å¹¾ä½•å‡¦ç†æ®µéš(hit)ã§æ—¢ã«è¨ˆç®—æ¸ˆã¿
         // [-1.0, 1.0] ==> [0.0, 1.0]
         return 0.5 * (rec.normal + vec3(1.0, 1.0, 1.0));
     }
-        
-    // ÒÔÏÂÎª±³¾°É«
-    // ¸ù¾İrµÄy·ÖÁ¿½øĞĞlerp
+
+    // èƒŒæ™¯è‰²ã®å‡¦ç†
+    // rayã®yæˆåˆ†ã«ã‚ˆã‚‹ç·šå½¢è£œé–“
     vec3 r_uint = unit_vector(r.direction());
     // [-1.0, 1.0] ==> [0.0, 1.0]
     double a = 0.5 * (r_uint.y() + 1.0);
 
-    // ·µ»ØÀ¶É«Óë°×É«Ö®¼äµÄlerp
+    // é’ã¨ç™½ã®ã‚°ãƒ©ãƒ‡ãƒ¼ã‚·ãƒ§ãƒ³
     return (1 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);;
 }
 
-// Çó³örayºÍsphere×î½üµÄ½»µã¶ÔÓ¦µÄtÖµ
+// å…‰ç·šã¨çƒä½“ã®æœ€ã‚‚è¿‘ã„äº¤ç‚¹ã«å¯¾å¿œã™ã‚‹tå€¤ã‚’ç®—å‡º
 double hit_sphere(const point3& center, double radius, const ray& r)
 {
     point3 o = r.origin();
     vec3 d = r.direction();
     vec3 oc = center - o;
 
-    // ×ª»¯Îª¶şÏîÊ½Çó½âÎ´ÖªÊıtµÄÎÊÌâ£¬ÍÆµ¼¹ı³Ì²Î¿¼derivation/sphere_hit.jpg
+    // è½¬åŒ–ä¸ºäºŒé¡¹å¼æ±‚è§£æœªçŸ¥æ•°tçš„é—®é¢˜ï¼Œæ¨å¯¼è¿‡ç¨‹å‚è€ƒreferrence/sphere_hit.jpg
+    // äºŒæ¬¡æ–¹ç¨‹å¼ã®è§£ã¨ã—ã¦tã‚’æ±‚ã‚ã‚‹ã“ã¨ã«ãªã‚‹ï¼ˆå°å‡ºéç¨‹ã¯referrence/sphere_hit.jpgå‚ç…§ï¼‰
     double a = d.length_squared();
     double h = dot(d, oc);
     double c = oc.length_squared() - radius * radius;
 
     double discriminant = h * h - a * c;
 
-    // Èç¹ûÅĞ±ğÊ½µÈÓÚ0£¬ÔòrayºÍsphereÖ»ÓĞÒ»¸ö½»µã
-    // Èç¹ûÅĞ±ğÊ½´óÓÚ0£¬ÔòrayºÍsphereÓĞÁ½¸ö½»µã
-    // Èç¹ûÅĞ±ğÊ½Ğ¡ÓÚ0£¬ÔòrayºÍsphereÓĞÃ»ÓĞ½»µã
+    /* åˆ¤åˆ¥å¼ã®æ¡ä»¶:
+       = 0 : ãƒ¬ã‚¤ã¨çƒãŒ1ç‚¹ã§æ¥ã™ã‚‹
+       > 0 : 2ç‚¹ã§äº¤å·®ã™ã‚‹
+       < 0 : äº¤å·®ç‚¹ãªã— */
     if (discriminant >= 0)
-        return (h - sqrt(discriminant)) / a; //Çót
+        return (h - sqrt(discriminant)) / a; //ã€€tã‚’æ±‚ã‚ã‚‹
 
-    // ÈôÎŞ½»µã£¬·µ»Ø¸ºÖµ
+    // äº¤ç‚¹ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯è² ã®å€¤ã‚’è¿”ã™
     return -1.0;
 }

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <cmath>
 #include <iostream>
@@ -17,9 +17,17 @@ public:
 	double y() const { return e[1]; }
 	double z() const { return e[2]; }
 
-	vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); } // Ò»Ôª¼õ·¨£¬²»ĞèÒª²ÎÊı
-	double operator[](int i) const { return e[i]; } //ÒòÎª·µ»ØµÄÊÇÒ»¸öÊıÖµÀàĞÍ£¬ËùÒÔ²»»áĞŞ¸Ä³ÉÔ±µÄÖµ£¬Òò´Ë¼ÓconstĞŞÊÎ
-	double& operator[](int i) { return e[i]; } //ÒòÎª·µ»ØµÄÊÇÒ»¸öÒıÓÃ£¬ËùÒÔÓĞ¿ÉÄÜĞŞ¸Ä³ÉÔ±±äÁ¿µÄÖµ£¬ËùÒÔ²»ÄÜ¼ÓconstĞŞÊÎ
+	// ä¸€å…ƒå‡æ³•ï¼Œä¸éœ€è¦å‚æ•°
+	// å˜é …ãƒã‚¤ãƒŠã‚¹æ¼”ç®—å­ï¼ˆå¼•æ•°ä¸è¦ï¼‰
+	vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); } 
+
+	// å› ä¸ºè¿”å›çš„æ˜¯ä¸€ä¸ªæ•°å€¼ç±»å‹ï¼Œæ‰€ä»¥ä¸ä¼šä¿®æ”¹æˆå‘˜çš„å€¼ï¼Œå› æ­¤åŠ constä¿®é¥°
+	// å®šæ•°ã‚¢ã‚¯ã‚»ã‚¹ç‰ˆï¼ˆãƒ¡ãƒ³ãƒã‚’å¤‰æ›´ã—ãªã„ãŸã‚constä¿®é£¾ï¼‰
+	double operator[](int i) const { return e[i]; } 
+
+	//å› ä¸ºè¿”å›çš„æ˜¯ä¸€ä¸ªå¼•ç”¨ï¼Œæ‰€ä»¥æœ‰å¯èƒ½ä¿®æ”¹æˆå‘˜å˜é‡çš„å€¼ï¼Œæ‰€ä»¥ä¸èƒ½åŠ constä¿®é¥°
+	// éå®šæ•°å‚ç…§ç‰ˆï¼ˆãƒ¡ãƒ³ãƒå¤‰æ›´ã®å¯èƒ½æ€§ãŒã‚ã‚‹ãŸã‚constä¿®é£¾ãªã—ï¼‰
+	double& operator[](int i) { return e[i]; }
 
 	vec3& operator+=(const vec3& v)
 	{
@@ -39,11 +47,11 @@ public:
 
 	vec3& operator/=(double t)
 	{
-		return (*this) *= (1.0 / t); //ÒòÎªÉÏÃæÒÑ¾­ÖØÔØÁË*=£¬ÕâÀï¿ÉÒÔÖ±½Ó¸´ÓÃ
+		return (*this) *= (1.0 / t); // æ—¢å­˜ã® *= ã‚’å†åˆ©ç”¨
 	}
 
 
-	// Çó3D¿Õ¼ä³¤¶È
+	// ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•è¨ˆç®—
 	double length() const
 	{
 		return sqrt(length_squared());
@@ -57,12 +65,15 @@ public:
 	
 };
 
-// ¸øvec3ÆğÒ»¸ö±ğÃû£¬Ö÷ÒªÊÇÎªÁË°Ñ¼¸ºÎÓëÑÕÉ«Çø·Ö¿ª
+// å¹¾ä½•è¨ˆç®—ç”¨ãƒã‚¤ãƒ³ãƒˆã‚¿ã‚¤ãƒ—ã®åˆ¥åå®šç¾©
 using point3 = vec3;
 
-// ÏòÁ¿¹¤¾ßº¯Êı¡£Àà³ÉÔ±º¯ÊıÖØÔØÁËÒ»ÔªÔËËã£¬ÕâÀïÔÚÀàÍâ²¿¶¨Òå¶şÔªÔËËã¡£
-// ³ÉÔ±º¯ÊıÄ¬ÈÏÊÇinline£¬µ«ÊÇÔÚÀàÍâ²¿ĞèÒªÊÖ¶¯Ö¸¶¨
-
+// å‘é‡å·¥å…·å‡½æ•°ã€‚ç±»æˆå‘˜å‡½æ•°é‡è½½äº†ä¸€å…ƒè¿ç®—ï¼Œè¿™é‡Œåœ¨ç±»å¤–éƒ¨å®šä¹‰äºŒå…ƒè¿ç®—ã€‚
+// æˆå‘˜å‡½æ•°é»˜è®¤æ˜¯inlineï¼Œä½†æ˜¯åœ¨ç±»å¤–éƒ¨éœ€è¦æ‰‹åŠ¨æŒ‡å®š
+// 
+// ãƒ™ã‚¯ãƒˆãƒ«ç”¨ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£é–¢æ•°ç¾¤ã€‚ã‚¯ãƒ©ã‚¹ãƒ¡ãƒ³ãƒé–¢æ•°ã§ã¯å˜é …æ¼”ç®—å­ã‚’ã‚ªãƒ¼ãƒãƒ¼ãƒ­ãƒ¼ãƒ‰ã—ã€
+// äºŒé …æ¼”ç®—å­ã¯ã‚¯ãƒ©ã‚¹å¤–éƒ¨ã§å®šç¾©ã—ã¦ã„ã¾ã™
+// ãƒ¡ãƒ³ãƒé–¢æ•°ã¯æš—é»™çš„ã«inlineæ‰±ã„ã¨ãªã‚Šã¾ã™ãŒã€ã‚¯ãƒ©ã‚¹å¤–éƒ¨å®šç¾©ã§ã¯æ˜ç¤ºçš„ãªinlineæŒ‡å®šãŒå¿…è¦ã§ã™
 inline ostream& operator<<(ostream& out, const vec3& v)
 {
 	return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
@@ -78,37 +89,35 @@ inline vec3 operator-(const vec3& u, const vec3& v)
 	return vec3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
 }
 
-// ÏòÁ¿ x ÏòÁ¿
 inline vec3 operator*(const vec3& u, const vec3& v) 
 {
 	return vec3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]);
 }
 
-// ±êÁ¿ x ÏòÁ¿
 inline vec3 operator*(double t, const vec3& v) 
 {
 	return vec3(t * v.e[0], t * v.e[1], t * v.e[2]);
 }
 
-// ÏòÁ¿ x ±êÁ¿
 inline vec3 operator*(const vec3& v, double t) 
 {
 	return t * v;
 }
 
-// ÏòÁ¿  / ±êÁ¿
 inline vec3 operator/(const vec3& v, double t) 
 {
-	return (1 / t) * v; // ¸´ÓÃÉÏÃæµÄ*¼´¿É
+	return (1 / t) * v; // æ—¢å­˜ã® *= ã‚’å†åˆ©ç”¨
 }
 
-// ÏòÁ¿µã³Ë
+// å‘é‡ç‚¹ä¹˜
+// å†…ç©è¨ˆç®—
 inline double dot(const vec3& u, const vec3& v) 
 {
 	return u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2];
 }
 
-// ÏòÁ¿²æ³Ë
+// å‘é‡å‰ä¹˜
+// å¤–ç©è¨ˆç®—
 inline vec3 cross(const vec3& u, const vec3& v) 
 {
 	return vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
@@ -116,7 +125,7 @@ inline vec3 cross(const vec3& u, const vec3& v)
 		        u.e[0] * v.e[1] - u.e[1] * v.e[0]);
 }
 
-// Çóµ¥Î»ÏòÁ¿£¬normalize
+// æ­£è¦åŒ–ï¼ˆå˜ä½ãƒ™ã‚¯ãƒˆãƒ«åŒ–ï¼‰
 inline vec3 unit_vector(const vec3& v) 
 {
 	return v / v.length();

@@ -1,4 +1,4 @@
-#include "vec3.h"
+ï»¿#include "vec3.h"
 #include "color.h"
 
 int main() {
@@ -8,10 +8,10 @@ int main() {
 
     cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-    // Êä³ö256x256µÄÍ¼Æ¬£¬RÔÚË®Æ½·½ÏòÉÏµÝÔö£¬GÔÚ´¹Ö±·½ÏòÉÏµÝÔö£¬B±£³ÖÎª0.0
+    // 256x256ã®ç”»åƒã‚’ç”Ÿæˆï¼ˆRå€¤ã¯æ°´å¹³æ–¹å‘ã«å¢—åŠ ã€Gå€¤ã¯åž‚ç›´æ–¹å‘ã«å¢—åŠ ã€Bå€¤ã¯å¸¸ã«0ï¼‰
     for (int j = 0; j < image_height; j++) // G
     {
-        // ÏÔÊ¾½ø¶È
+        // é€²æ—çŠ¶æ³ã‚’è¡¨ç¤º
         clog << "\rScanlines remaining: " << (image_height - j) << ' ' << flush;
 
         for (int i = 0; i < image_width; i++) // R
