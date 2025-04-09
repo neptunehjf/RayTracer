@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "hittable.h"
 
@@ -7,11 +7,17 @@ class material
 public:
 	virtual ~material() = default;
 
-	//²»Í¬µÄ²ÄÖÊµÄÉ¢ÉäÌØĞÔ²»Í¬£¬Òò´ËÕâÀïÖ»¶¨ÒåÈ«Ğéº¯Êı£¬¾ßÌåÓÉ¸÷²ÄÖÊÀ´ÊµÏÖ
-	// ray_in ÈëÉä¹âÏß
-	// rec ½»µãĞÅÏ¢£¬°üº¬ÁË¾ßÌåµÄ²ÄÖÊÀàĞÍ
-	// attenuation ÄÜÁ¿Ë¥¼õ(¶ÔÓÚÎïÌå±íÃæÎüÊÕµÄÄÜÁ¿À´Ëµ)£¬¾ÍÊÇ±»·´ÉäÄÜÁ¿±ÈÀı
-	// ray_out ³öÉä¹âÏß£¨É¢Éä¹âÏß£©
+	//ä¸åŒçš„æè´¨çš„æ•£å°„ç‰¹æ€§ä¸åŒï¼Œå› æ­¤è¿™é‡Œåªå®šä¹‰å…¨è™šå‡½æ•°ï¼Œå…·ä½“ç”±å„æè´¨æ¥å®ç°
+	// ray_in å…¥å°„å…‰çº¿
+	// rec äº¤ç‚¹ä¿¡æ¯ï¼ŒåŒ…å«äº†å…·ä½“çš„æè´¨ç±»å‹
+	// attenuation èƒ½é‡è¡°å‡(å¯¹äºç‰©ä½“è¡¨é¢å¸æ”¶çš„èƒ½é‡æ¥è¯´)ï¼Œå°±æ˜¯è¢«åå°„èƒ½é‡æ¯”ä¾‹
+	// ray_out å‡ºå°„å…‰çº¿ï¼ˆæ•£å°„å…‰çº¿ï¼‰
+	//
+	// æ•£ä¹±ç‰¹æ€§ã‚’è¨ˆç®—ã™ã‚‹ä»®æƒ³é–¢æ•°
+	// ray_in: å…¥å°„å…‰ç·š
+	// rec: äº¤ç‚¹æƒ…å ±ï¼ˆæè³ªæƒ…å ±ã‚’å«ã‚€ï¼‰
+	// attenuation: ã‚¨ãƒãƒ«ã‚®ãƒ¼æ¸›è¡°ç‡ï¼ˆè¡¨é¢ã§ã®åå°„ç‡ï¼‰
+	// ray_out: æ•£ä¹±å¾Œã®å…‰ç·š
 	virtual bool scatter(const ray& ray_in, const hit_record& rec,
 		                 color& attenuation, ray& ray_out) const
 	{
@@ -27,11 +33,15 @@ public:
 	bool scatter(const ray& ray_in, const hit_record& rec,
 		color& attenuation, ray& ray_out) const override
 	{
-		// ¸ù¾İlambertian reflectionÄ£ĞÍËã³öµÄËæ»ú·´Éä·½Ïò£¬ºÍnormal¼Ğ½ÇÔ½Ğ¡£¬¸ÅÂÊÔ½´ó
-		// ²Î¿¼referrence/lambertian reflection.png
+		// æ ¹æ®lambertian reflectionæ¨¡å‹ç®—å‡ºçš„éšæœºåå°„æ–¹å‘ï¼Œå’Œnormalå¤¹è§’è¶Šå°ï¼Œæ¦‚ç‡è¶Š
+		// 
+		// å‚è€ƒreferrence/lambertian reflection.png
+		// 
+		// Lambertianåå°„ãƒ¢ãƒ‡ãƒ«ã«åŸºã¥ããƒ©ãƒ³ãƒ€ãƒ åå°„æ–¹å‘è¨ˆç®—
+		// æ³•ç·šæ–¹å‘ã¨ã®è§’åº¦ãŒå°ã•ã„ã»ã©ç¢ºç‡ãŒé«˜ããªã‚‹
 		vec3 out_dir = rec.normal + random_unit_vector();
 
-		//·ÀÖ¹dirÊÇ0ÏòÁ¿µÄÇé¿ö
+		// ã‚¼ãƒ­ãƒ™ã‚¯ãƒˆãƒ«å›é¿
 		if (out_dir.near_zero())
 			out_dir = rec.normal;
 
@@ -54,9 +64,13 @@ public:
 		color& attenuation, ray& ray_out) const override
 	{
 		vec3 out_dir = reflect(ray_in.direction(), rec.normal);
-		// fuzz:½ğÊô·´ÉäºóÔÙ½øĞĞÒ»´Î·½ÏòËæ»ú£¬Ê¹½ğÊô¿´ÆğÀ´ÓĞÄ¥É°Ğ§¹û
-		// ²Î¿¼£ºreferrence/fuzzy reflection.png
-		// ×¢Òâ£¬ÕâÀïĞèÒª¸ù¾İfuzzµÄÖµÀ´È·¶¨Ğ§¹ûµÄ³Ì¶È£¬ËùÒÔÆäËûµÄÒò×Ó(dirÏòÁ¿£¬fuzzµÄÏòÁ¿)ÒªÊÇ¹éÒ»»¯µÄ£¬fuzzµÄÖµ²ÅÓĞÒâÒå
+		// å‚ç…§ï¼šreferrence/fuzzy reflection.png
+		// fuzz:é‡‘å±åå°„åå†è¿›è¡Œä¸€æ¬¡æ–¹å‘éšæœºï¼Œä½¿é‡‘å±çœ‹èµ·æ¥æœ‰ç£¨ç ‚æ•ˆæœ
+		// æ³¨æ„ï¼Œè¿™é‡Œéœ€è¦æ ¹æ®fuzzçš„å€¼æ¥ç¡®å®šæ•ˆæœçš„ç¨‹åº¦ï¼Œæ‰€ä»¥å…¶ä»–çš„å› å­(dirå‘é‡ï¼Œfuzzçš„å‘é‡)è¦æ˜¯å½’ä¸€åŒ–çš„ï¼Œfuzzçš„å€¼æ‰æœ‰æ„ä¹‰
+		// 
+		// fuzz: é‡‘å±åå°„å¾Œã«æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’ãƒ©ãƒ³ãƒ€ãƒ åŒ–ã—ã¦è¡¨é¢ã®ã¤ã‚„æ¶ˆã—åŠ¹æœã‚’è¡¨ç¾
+		// æ³¨æ„: åŠ¹æœã®å¼·ã•ã‚’fuzzå€¤ã§åˆ¶å¾¡ã™ã‚‹ãŸã‚ã€å…ƒã®åå°„æ–¹å‘(dir)ã¨ä¹±ã‚Œãƒ™ã‚¯ãƒˆãƒ«ã¯
+		// å˜ä½ãƒ™ã‚¯ãƒˆãƒ«ã«æ­£è¦åŒ–ã•ã‚Œã¦ã„ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ï¼ˆç‰©ç†çš„ã«æ„å‘³ã®ã‚ã‚‹è¨ˆç®—ã®ãŸã‚ï¼‰
 		out_dir = unit_vector(out_dir) + fuzz * random_unit_vector();
 		ray_out = ray(rec.p, out_dir);
 		attenuation = albedo;
@@ -77,6 +91,7 @@ public:
 	bool scatter(const ray& ray_in, const hit_record& rec,
 		color& attenuation, ray& ray_out) const override
 	{
+		// å±ˆæŠ˜ç‡ã®è¨ˆç®—ï¼ˆåª’è³ªã®å†…å¤–åˆ¤å®šï¼‰
 		double ri = rec.front_face ? (1.0 / refraction_index) : refraction_index;
 
 		vec3 unit_v = unit_vector(ray_in.direction());
@@ -85,36 +100,45 @@ public:
 
 		vec3 out_dir;
 
-		// È«ÄÚ·´Éä£¬²Î¿¼referrence/total internal reflection.png
-		// Schlick's approximation£¬Ä£ÄâFresnelÏÖÏó£¬ÕâÀïÔİÊ±ÓÃ¼òµ¥µÄrandom_double()ÒıÈëËæ»úĞÔ
+		// Schlick's approximationï¼Œæ¨¡æ‹ŸFresnelç°è±¡ï¼Œè¿™é‡Œæš‚æ—¶ç”¨ç®€å•çš„random_double()å¼•å…¥éšæœºæ€§
+		// 
+		// å…¨åå°„åˆ¤å®šï¼ˆã‚¹ãƒãƒ«ã®æ³•å‰‡ï¼‰ã¨ã‚·ãƒ¥ãƒªãƒƒã‚¯è¿‘ä¼¼ã«ã‚ˆã‚‹åå°„ç¢ºç‡è¨ˆç®—
+		// 
+		// å‚ç…§: referrence/total internal reflection.png
 		if (ri * sin_theta > 1.0 || reflectance(cos_theta, ri) > random_double())
 		{
+			// åå°„æ–¹å‘è¨ˆç®—
 			out_dir = reflect(unit_v, rec.normal);
 		}
 		else
 		{
-			// ÕÛÉä
-			// ÕâÀïÏòÁ¿Èë²Î½ÔÎªµ¥Î»ÏòÁ¿
+			// å±ˆæŠ˜æ–¹å‘è¨ˆç®—ï¼ˆå…¥åŠ›ãƒ™ã‚¯ãƒˆãƒ«ã¯æ­£è¦åŒ–æ¸ˆã¿ï¼‰
 			out_dir = refract(unit_v, rec.normal, ri);
 		}
 
 		ray_out = ray(rec.p, out_dir);
 
-		// ²»ÎüÊÕÄÜÁ¿£¬È«²¿·´Éä»òÕßÕÛÉä
+		// ã‚¨ãƒãƒ«ã‚®ãƒ¼å¸åãªã—ï¼ˆå®Œå…¨åå°„/å±ˆæŠ˜ï¼‰
 		attenuation = color(1.0, 1.0, 1.0); 
 
 		return true;
 	}
 
 private:
-	// ±»ÕÛÉä½éÖÊµÄÄÚÍâµÄÏà¶ÔÕÛÉäÂÊ
-	// ×¢Òâ¿ÕÆøÔÚ½éÖÊÍâµÄÊ±ºò£¬·ÖÄ¸¿ÉºöÂÔ£¬ÒòÎªÏµÊıÊÇ1.0
+	// è¢«æŠ˜å°„ä»‹è´¨çš„å†…å¤–çš„ç›¸å¯¹æŠ˜å°„ç‡
+	// æ³¨æ„ç©ºæ°”åœ¨ä»‹è´¨å¤–çš„æ—¶å€™ï¼Œåˆ†æ¯å¯å¿½ç•¥ï¼Œå› ä¸ºç³»æ•°æ˜¯1.0
+	//
+	// ç›¸å¯¾å±ˆæŠ˜ç‡ï¼ˆå¤–éƒ¨åª’è³ªã«å¯¾ã™ã‚‹å†…éƒ¨åª’è³ªã®æ¯”ï¼‰
+	// æ³¨: å¤–éƒ¨ãŒç©ºæ°—ã®å ´åˆã¯åˆ†æ¯ã‚’1.0ã¨ã¿ãªã›ã‚‹
 	double refraction_index;
 
-	// Çó·´ÉäÂÊ¡£¸ù¾İFresnelÏÖÏó£¬grazing½Ç¶È¹Û²ì£¬·´¹âÔ½Ç¿
+	// æ±‚åå°„ç‡ã€‚æ ¹æ®Fresnelç°è±¡ï¼Œgrazingè§’åº¦è§‚å¯Ÿï¼Œåå…‰è¶Šå¼º
+	//
+	// ãƒ•ãƒ¬ãƒãƒ«åå°„ç‡è¨ˆç®—ï¼ˆã‚·ãƒ¥ãƒªãƒƒã‚¯è¿‘ä¼¼ï¼‰
+	// ã‚°ãƒ©ãƒ¼ã‚¸ãƒ³ã‚°è§’ï¼ˆæµ…ã„å…¥å°„è§’ï¼‰ã§åå°„ç‡ãŒä¸Šæ˜‡ã™ã‚‹ç¾è±¡ã‚’è¡¨ç¾
 	static double reflectance(double cos_theta, double ri) 
 	{
-		// Schlick's approximation ²Î¿¼referrence/schlick approximation.png
+		// Schlick's approximation å‚ç…§referrence/schlick approximation.png
 		double r0 = (1 - ri) / (1 + ri);
 		r0 = r0 * r0;
 		return r0 + (1 - r0) * pow((1 - cos_theta), 5);

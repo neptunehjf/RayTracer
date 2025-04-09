@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "common.h"
 #include "hittable.h"
@@ -8,31 +8,34 @@ class sphere : public hittable
 public:
 	sphere(const point3& center, double radius, shared_ptr<material> mat) : center(center), radius(fmax(0.0, radius)), mat(mat) {}
 
-	// ÏÔÊ¾¼Óoverride¹Ø¼ü×ÖµÄºÃ´¦ÊÇ£¬Ò»ÊÇ¿É¶ÁĞÔºÃ£¬¶şÊÇ±àÒëÆ÷»áµ±×÷ÖØĞ´º¯ÊıÀ´¼ì²é
+	// æ˜¾ç¤ºåŠ overrideå…³é”®å­—çš„å¥½å¤„æ˜¯ï¼Œä¸€æ˜¯å¯è¯»æ€§å¥½ï¼ŒäºŒæ˜¯ç¼–è¯‘å™¨ä¼šå½“ä½œé‡å†™å‡½æ•°æ¥æ£€æŸ¥
+    // overrideæŒ‡å®šã®åˆ©ç‚¹ï¼š
+    // 1. å¯èª­æ€§å‘ä¸Šï¼ˆæ˜ç¤ºçš„ãªã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ï¼‰
+    // 2. ã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ã«ã‚ˆã‚‹ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰ãƒã‚§ãƒƒã‚¯
 	bool hit(const ray& r, interval& ray_t, hit_record& rec) const override
 	{
         point3 o = r.origin();
         vec3 d = r.direction();
         vec3 oc = center - o;
 
-        // ×ª»¯Îª¶şÏîÊ½Çó½âÎ´ÖªÊıtµÄÎÊÌâ£¬ÍÆµ¼¹ı³Ì²Î¿¼referrence/sphere_hit.jpg
-        // ¼ò»¯¹ı³Ì²Î¿¼referrence/quadratic_simplify.jpg
+        // äºŒæ¬¡æ–¹ç¨‹å¼ã®è§£ã¨ã—ã¦è¡çªç‚¹tã‚’æ±‚ã‚ã‚‹
+        // å°å‡ºéç¨‹ï¼šreferrence/sphere_hit.jpg
+        // å¼ç°¡ç•¥åŒ–ï¼šreferrence/quadratic_simplify.jpg
         double a = d.length_squared();
         double h = dot(d, oc);
         double c = oc.length_squared() - radius * radius;
 
         double discriminant = h * h - a * c;
 
-        // Èç¹ûÅĞ±ğÊ½µÈÓÚ0£¬ÔòrayºÍsphereÖ»ÓĞÒ»¸ö½»µã
-        // Èç¹ûÅĞ±ğÊ½´óÓÚ0£¬ÔòrayºÍsphereÓĞÁ½¸ö½»µã
-        // Èç¹ûÅĞ±ğÊ½Ğ¡ÓÚ0£¬ÔòrayºÍsphereÓĞÃ»ÓĞ½»µã
+        // åˆ¤åˆ¥å¼ã«ã‚ˆã‚‹è¡çªåˆ¤å®š
+        // >0: 2äº¤ç‚¹, =0: 1äº¤ç‚¹, <0: è¡çªãªã—
         double t, t_min, t_max;
         if (discriminant >= 0)
         {
             t_min = (h - sqrt(discriminant)) / a;
             t_max = (h + sqrt(discriminant)) / a;
 
-            // ÇóÔÚray_tmin~ray_tmax·¶Î§ÄÚµÄ×î½üµÄ½»µã
+            // ãƒ¬ã‚¤ã®æœ‰åŠ¹ç¯„å›²å†…ã§æœ€ã‚‚è¿‘ã„äº¤ç‚¹ã‚’é¸æŠ
             if (ray_t.surrounds(t_min))
                 t = t_min;
             else if (ray_t.surrounds(t_max))
@@ -40,10 +43,14 @@ public:
             else
                 return false;
 
-            // ´«³ö½»µãµÄ¼ÇÂ¼
+            // è¡çªæƒ…å ±ã®è¨˜éŒ²
             rec.p = r.at(t);
-            // 1.×¢ÒâÕâÀï²¢Ã»ÓÃunit_vector·½·¨¼ÆËãoutward_normal£¬ÕâÑù¿ÉÒÔ¼õÉÙsqrtÔËËã£¬ÌáÉıĞ§ÂÊ
-            // 2.²»ĞèÒªnormalizeµÄµØ·½¾Í¾¡Á¿²»Òªnormalize
+
+            // 1.æ³¨æ„è¿™é‡Œå¹¶æ²¡ç”¨unit_vectoræ–¹æ³•è®¡ç®—outward_normalï¼Œè¿™æ ·å¯ä»¥å‡å°‘sqrtè¿ç®—ï¼Œæå‡æ•ˆç‡
+            // 2.ä¸éœ€è¦normalizeçš„åœ°æ–¹å°±å°½é‡ä¸è¦normalize
+            //
+            // 1. unit_vectorã‚’ä½¿ç”¨ã›ãšå¤–å‘æ³•ç·šã‚’è¨ˆç®— â†’ sqrtè¨ˆç®—å›æ•°ã®å‰Šæ¸›ã«ã‚ˆã‚Šå‡¦ç†åŠ¹ç‡å‘ä¸Š
+            // 2. æ­£è¦åŒ–ãŒä¸è¦ãªç®‡æ‰€ã§ã¯è¨ˆç®—ã‚³ã‚¹ãƒˆã®é«˜ã„normalizeå‡¦ç†ã‚’å›é¿
             vec3 outward_normal = (rec.p - center) / radius; 
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
@@ -55,7 +62,7 @@ public:
 	}
 
 private:
-	point3 center;  // ÇòĞÄ
-    double radius;  // °ë¾¶
-    shared_ptr<material> mat; //²ÄÖÊ
+	point3 center;  // çƒä½“ä¸­å¿ƒåº§æ¨™
+    double radius;  // çƒä½“åŠå¾„
+    shared_ptr<material> mat; //æè³ª
 };

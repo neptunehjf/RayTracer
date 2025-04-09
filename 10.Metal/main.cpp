@@ -1,4 +1,4 @@
-#include "common.h"
+﻿#include "common.h"
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
@@ -20,8 +20,13 @@ int main()
     auto material_left = make_shared<metal>(color(0.8, 0.8, 0.8), 0.3);
     auto material_right = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0);
 
-    // ע������point3(xxxxx)����ֵ
-    // ����sphere���캯�������Ҫô��const point3&��Ҫô��point&&��������뱨��
+    // 注意这里point3(XXXXX)是右值
+    // 所以sphere构造函数的入参要么是const point3&，要么是point&&，否则编译报错
+    //
+    // 1. ここで使用されているpoint3(XXXXX)は右辺値（rvalue）です
+    // 2. したがってsphereコンストラクタの引数は、const point3& または point3&& で宣言する必要があります
+    //    （これら以外の形式では右辺値のバインドが不可能となり、コンパイルエラーが発生します）
+
     scene.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, material_ground));
     scene.add(make_shared<sphere>(point3(0.0, 0.0, -1.2), 0.5, material_center));
     scene.add(make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, material_left));

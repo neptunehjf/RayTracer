@@ -1,4 +1,4 @@
-#include "common.h"
+ï»¿#include "common.h"
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
@@ -34,7 +34,7 @@ int main()
             double choose_mat = random_double();
             point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
 
-            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 && // È¥³ýÁËÀë´óÇò¹ýÓÚ½Ó½üµÄÐ¡Çò
+            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 && // åŽ»é™¤äº†ç¦»å¤§çƒè¿‡äºŽæŽ¥è¿‘çš„å°çƒ
                 (center - point3(-4.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(4.0, 0.2, 0.0)).length() > 1.0)
             {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "common.h"
 
 class interval
@@ -23,7 +23,8 @@ public:
 			return max;
 	}
 
-	// ����������ͬ���͵ľ�̬�����ǺϷ��ģ����ᵼ�µݹ鶨��
+	// 声明和类相同类型的静态变量是合法的，不会导致递归定义
+	// クラス自身と同じ型の静的メンバ変数の宣言は有効であり、再帰的定義を引き起こさない
 	static const interval empty, universe;
 };
 
