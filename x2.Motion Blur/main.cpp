@@ -1,4 +1,4 @@
-#include "common.h"
+ï»¿#include "common.h"
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
@@ -34,7 +34,7 @@ int main()
             double choose_mat = random_double();
             point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
 
-            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 && // È¥³ıÁËÀë´óÇò¹ıÓÚ½Ó½üµÄĞ¡Çò
+            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 && // å»é™¤äº†ç¦»å¤§çƒè¿‡äºæ¥è¿‘çš„å°çƒ
                 (center - point3(-4.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(4.0, 0.2, 0.0)).length() > 1.0)
             {
@@ -46,7 +46,7 @@ int main()
                     color albedo = color::random() * color::random();
                     sphere_material = make_shared<diffuse>(albedo);
 
-                    // center2µÄÎ»ÖÃ·´Ó¦ÁËÎïÌåµÄÔË¶¯ËÙ¶È
+                    // center2ã®ä½ç½®ã¯ç‰©ä½“ã®é‹å‹•é€Ÿåº¦ã‚’åæ˜ ã—ã¦ã„ã¾ã™
                     point3 center2 = center + vec3(0, random_double(0, 0.5), 0);
                     scene.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
                 }

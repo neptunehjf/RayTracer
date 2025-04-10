@@ -1,4 +1,4 @@
-#include "common.h"
+ï»¿#include "common.h"
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
@@ -9,7 +9,7 @@ int main()
 {
     time_t start_time, end_time;
 
-    // ¿ªÊ¼¼ÆÊ±
+    // ã‚¿ã‚¤ãƒŸãƒ³ã‚°é–‹å§‹
     time(&start_time);
 
     // Camera
@@ -40,7 +40,8 @@ int main()
             double choose_mat = random_double();
             point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
 
-            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 && // È¥³ıÁËÀë´óÇò¹ıÓÚ½Ó½üµÄĞ¡Çò
+            // å¤§ããªçƒä½“ã«è¿‘æ¥ã—ã™ãã¦ã„ã‚‹å°ã•ãªçƒä½“ã‚’é™¤å»
+            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(-4.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(4.0, 0.2, 0.0)).length() > 1.0)
             {
@@ -52,7 +53,7 @@ int main()
                     color albedo = color::random() * color::random();
                     sphere_material = make_shared<diffuse>(albedo);
 
-                    // center2µÄÎ»ÖÃ·´Ó¦ÁËÎïÌåµÄÔË¶¯ËÙ¶È
+                    // center2ã®åº§æ¨™å€¤ãŒç‰©ä½“ã®é‹å‹•é€Ÿåº¦ã‚’åæ˜ ã—ã¦ã„ã‚‹
                     point3 center2 = center + vec3(0, random_double(0, 0.5), 0);
                     scene.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
                 }
@@ -88,7 +89,7 @@ int main()
     // Render
     cam.render(scene);
 
-    // ½áÊø¼ÆÊ±
+    // ã‚¿ã‚¤ãƒŸãƒ³ã‚°çµ‚äº†
     time(&end_time);
 
     clog << "elapsed time: " << difftime(end_time, start_time) << " seconds\n";

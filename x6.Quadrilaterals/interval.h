@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "common.h"
 
 class interval
@@ -31,21 +31,23 @@ public:
 			return x;
 	}
 
-	// rayÓëslabÖØºÏµÄ³¡ºÏ£¬t_minºÍt_max¶¼ÊÇNaN£¬ËùÒÔ(t_min <= t_max)µÄ½á¹û±ØÎªfalse
-	// µ«ÊÇÊµ¼ÊÉÏÕâÖÖÇé¿öÒ²Ó¦¸ÃËãÊÇÓĞ½»µã(¶ÔÓÚÊÇÇòÌåµÄÇé¿ö grazing angle)£¬ËùÒÔÉÔÎ¢À©³äÒ»ÏÂAABBµÄ´óĞ¡£¬Ê¹(t_min <= t_max)µÄ½á¹ûÎªtrue
-	// ¾ßÌå²Î¿¼ referrence/aabb.jpg ÌØÊâÇé¿ö3
+	// rayä¸slabé‡åˆçš„åœºåˆï¼Œt_minå’Œt_maxéƒ½æ˜¯NaNï¼Œæ‰€ä»¥(t_min <= t_max)çš„ç»“æœå¿…ä¸ºfalse
+	// ä½†æ˜¯å®é™…ä¸Šè¿™ç§æƒ…å†µä¹Ÿåº”è¯¥ç®—æ˜¯æœ‰äº¤ç‚¹(grazing angle)ï¼Œæ‰€ä»¥ç¨å¾®æ‰©å……ä¸€ä¸‹AABBçš„å¤§å°ï¼Œä½¿(t_min <= t_max)çš„ç»“æœä¸ºtrue
 	// 
-	// ÁíÒ»ÖÖÇé¿öÊÇÍ¼ÔªÎªÃæµÄÇé¿ö£¬ÕâÊ±ºòÃ»ÓĞÌå»ı£¬¾ÍĞèÒªÀ©³ä£¬·ñÔò¿ÉÄÜ»áÓĞÊıÑ§´íÎó
+	// rayãŒslabã¨å®Œå…¨ã«ä¸€è‡´ã™ã‚‹å ´åˆã€t_minã¨t_maxãŒNaNã¨ãªã‚Š(t_min <= t_max)ã¯falseã«ãªã‚‹
+	// å®Ÿéš›ã¯ã“ã®ã‚±ãƒ¼ã‚¹ã‚‚äº¤å·®ã¨è¦‹ãªã™ã¹ãï¼ˆã‚°ãƒ¬ãƒ¼ã‚¸ãƒ³ã‚°ã‚±ãƒ¼ã‚¹ï¼‰ã®ãŸã‚ã€AABBã‚’å¾®å°æ‹¡å¼µã—ã¦(t_min <= t_max)ã‚’æˆç«‹ã•ã›ã‚‹
+	// 
+	// å‚ç…§ referrence/aabb.jpg
 	interval expand(double delta) const
 	{
 		double padding = delta / 2;
 		return interval(min - padding, max + padding);
 	}
 
-	// <ÉùÃ÷>ºÍÀàÏàÍ¬ÀàĞÍµÄ¾²Ì¬±äÁ¿ÊÇºÏ·¨µÄ£¬<ÉùÃ÷>²»»á·ÖÅäÄÚ´æ£¬Òò´Ë²»»áµ¼ÖÂµİ¹é¶¨Òå
+	// å£°æ˜å’Œç±»ç›¸åŒç±»å‹çš„é™æ€å˜é‡æ˜¯åˆæ³•çš„ï¼Œä¸ä¼šå¯¼è‡´é€’å½’å®šä¹‰
+	// ã‚¯ãƒ©ã‚¹è‡ªèº«ã¨åŒã˜å‹ã®é™çš„ãƒ¡ãƒ³ãƒå¤‰æ•°ã®å®£è¨€ã¯æœ‰åŠ¹ã§ã‚ã‚Šã€å†å¸°çš„å®šç¾©ã‚’å¼•ãèµ·ã“ã•ãªã„
 	static const interval empty, universe;
 };
 
-// <¶¨Òå>ºÍÀàÏàÍ¬ÀàĞÍµÄ¾²Ì¬±äÁ¿ÊÇÔÚÀàÍâ²¿½øĞĞµÄ£¬ÔÚ´Ë´¦»á·ÖÅäÄÚ´æ
 const interval interval::empty = interval(inf, -inf);
 const interval interval::universe = interval(-inf, inf);

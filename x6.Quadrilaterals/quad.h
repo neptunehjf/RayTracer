@@ -1,39 +1,43 @@
-#pragma once
+ï»¿#pragma once
 
 #include "common.h"
 #include "hittable.h"
 
-// ËÄ±ßĞÎ
-// ²ÎÕÕ referrence/ray-quad-intersection.jpg
+// å››è¾ºå½¢
+// å‚ç…§ referrence/ray-quad-intersection.jpg
 class quad : public hittable
 {
 public:
 	quad(const point3& Q, const vec3& u, const vec3& v, shared_ptr<material> mat) :
 		Q(Q), u(u), v(v), mat(mat) 
 	{
-		// ¼ÆËãËÄ±ßĞÎµÄbbox
+		// å››è¾ºå½¢ã®bboxã‚’è¨ˆç®—
 		auto bbox1 = aabb(Q, Q + u + v);
 		auto bbox2 = aabb(Q + u, Q + v);
 		bbox = aabb(bbox1, bbox2);
 
-		// ²ÎÕÕ referrence/ray-quad-intersection.jpg ¢Ú
+		// å‚ç…§ referrence/ray-quad-intersection.jpg â‘¡
 		vec3 n = cross(u, v);
 		normal = unit_vector(n);
 		D = dot(normal, Q);
-		// ²ÎÕÕ referrence/ray-quad-intersection.jpg ¢Û
-		// ×¢ÒâwµÄ·¨ÏßÒªÓÃÎ´¹éÒ»»¯µÄ£¬ÒòÎªn = cross(u, v);
+		// å‚ç…§ referrence/ray-quad-intersection.jpg â‘¢
+		// æ³¨æ„ï¼šwã®æ³•ç·šã¯æ­£è¦åŒ–å‰ã®å€¤ã‚’ä½¿ç”¨ï¼ˆn = cross(u, v)ã®ã¾ã¾ï¼‰
 		w = n / dot(n, n);
 	}
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override
     {
-		// ²ÎÕÕ referrence/ray-quad-intersection.jpg ¢Ù
+		// å‚ç…§ referrence/ray-quad-intersection.jpg â‘ 
 
-		// ·ÖÄ¸
+		// åˆ†æ¯è¨ˆç®—
 		double denom = dot(normal, r.direction());
 
-		// ºÍsphere²»Í¬£¬quad²»ĞèÒª¿¼ÂÇgrazing case£¬ÇÒquadÃ»ÓĞºñ¶È
-		// Òò´ËÖ»ÒªrayÓëlabÆ½ĞĞ¾ÍÒ»¶¨·µ»Øfalse
+		// å’Œsphereä¸åŒï¼Œquadä¸éœ€è¦è€ƒè™‘grazing caseï¼Œä¸”quadæ²¡æœ‰åšåº¦
+		// å› æ­¤åªè¦rayä¸labå¹³è¡Œå°±ä¸€å®šè¿”å›false
+		//
+		// çƒä½“ã¨ã®é•ã„ï¼šå››è¾ºå½¢ã¯åšã¿ãŒãªãã€æ å…¥å°„ã‚±ãƒ¼ã‚¹ã‚’è€ƒæ…®ä¸è¦
+		// ãƒ¬ã‚¤ãŒå¹³é¢ã¨å¹³è¡Œãªã‚‰å³æ™‚falseã‚’è¿”ã™
+
 		if (fabs(denom) < 1e-8)
 			return false;
 
@@ -42,10 +46,13 @@ public:
 			return false;
 
 		point3 intersection = r.at(t);
-		// ÒÔÉÏÖ»ÄÜËµÃ÷½»µãÔÚ¸ÃÆ½ÃæÄÚ
+		// ä»¥ä¸Šåªèƒ½è¯´æ˜äº¤ç‚¹åœ¨è¯¥å¹³é¢å†…
+		// ä»¥ä¸‹è®¡ç®—è¯¥äº¤ç‚¹æ˜¯å¦åœ¨è¯¥å››è¾¹å½¢å†… P=Q+Î±u+Î²v
 		// 
-		// ÒÔÏÂ¼ÆËã¸Ã½»µãÊÇ·ñÔÚ¸ÃËÄ±ßĞÎÄÚ P=Q+¦Áu+¦Âv
-		// ²ÎÕÕ referrence/ray-quad-intersection.jpg
+		// // ã“ã“ã¾ã§ã®è¨ˆç®—ã¯å¹³é¢å†…ã®äº¤ç‚¹ã®ã¿ä¿è¨¼
+		// ä»¥ä¸‹ã¯äº¤ç‚¹ãŒå››è¾ºå½¢å†…éƒ¨ã«ã‚ã‚‹ã‹ã¨ã‹ã®è¨ˆç®—ã€€P=Q+Î±u+Î²v
+		// 
+		// å‚ç…§ referrence/ray-quad-intersection.jpg
 		vec3 p = intersection - Q;
 		double alpha = dot(w, cross(p, v));
 		double beta = dot(w, cross(u, p));
@@ -53,7 +60,7 @@ public:
 		if (!is_inside(alpha, beta, rec))
 			return false;
 
-		// ´«³ö½»µãµÄ¼ÇÂ¼
+		// è¡çªæƒ…å ±ã®è¨˜éŒ²
 		rec.p = intersection;
 		rec.set_face_normal(r, normal);
 		rec.t = t;
@@ -68,25 +75,24 @@ public:
 	}
 
 private:
-	// Q,u,v¾ö¶¨ÁËÒ»¸öËÄ±ßĞÎ
-	point3 Q;  // ËÄ±ßĞÎÆğÊ¼µã
-	vec3 u, v; // ËÄ±ßĞÎµÄÁ½Ìõ±ß
-	shared_ptr<material> mat; //²ÄÖÊ
-	aabb bbox; // aabb°üÎ§ºĞ
-	vec3 normal; // ·¨Ïß
-	double D; // DÖµ
-	vec3 w; //ÁÙÊ±ÏòÁ¿£¬ÓÃÓÚ¼ò»¯¼ÆËã
+	// Q,u,vãŒå››è¾ºå½¢ã‚’å®šç¾©
+	point3 Q; // å››è¾ºå½¢ã®èµ·ç‚¹
+	vec3 u, v; // å››è¾ºå½¢ã®è¾ºãƒ™ã‚¯ãƒˆãƒ«
+	shared_ptr<material> mat; // ãƒãƒ†ãƒªã‚¢ãƒ«
+	aabb bbox; // AABBãƒã‚¦ãƒ³ãƒ‡ã‚£ãƒ³ã‚°ãƒœãƒƒã‚¯ã‚¹
+	vec3 normal; // æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«
+	double D; // å¹³é¢æ–¹ç¨‹å¼ã®Då€¤
+	vec3 w; // è¨ˆç®—ç”¨ä¸€æ™‚ãƒ™ã‚¯ãƒˆãƒ«
 
 	bool is_inside(double alpha, double beta, hit_record& rec) const
 	{
-		// Èç¹ûalpha£¬beta¶¼ÔÚ0µ½1µÄ·¶Î§ÄÚ£¬ËµÃ÷½»µãÔÚ
-
+		// alphaã¨betaãŒ[0,1]ç¯„å›²å†…ãªã‚‰äº¤ç‚¹ãŒå››è¾ºå½¢å†…éƒ¨ã«ã‚ã‚‹
 		interval unit_interval(0, 1);
 
 		if (!unit_interval.contains(alpha) || !unit_interval.contains(beta))
 			return false;
 
-		// ·¶Î§¶¼ÊÇ[0, 1£¬]ÕıºÃ¿ÉÒÔÓÃÓÚUV mapping
+		// [0,1]ç¯„å›²ã‚’UVãƒãƒƒãƒ”ãƒ³ã‚°ã«ç›´æ¥åˆ©ç”¨
 		rec.u = alpha;
 		rec.v = beta;
 		return true;

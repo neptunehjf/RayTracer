@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <iostream>
 #include <limits>
@@ -22,18 +22,19 @@ inline double degree_to_radian(double degree)
 
 inline double random_double()
 {
-	// ÕâÀïÈ«¾ÖÖ»Ğè1¸öÖÖ×Ó£¬1¸öÎ±Ëæ»úÊıÁĞ£¬Òò´Ë¼ÓstaticĞŞÊÎ   
+	// ã‚°ãƒ­ãƒ¼ãƒãƒ«ã§å˜ä¸€ã®ä¹±æ•°ç”Ÿæˆå™¨ã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚staticä¿®é£¾       
 	static mt19937 generator;
-	// ÒòÎª·¶Î§ÊÇ¹Ì¶¨µÄ(0.0, 1.0)£¬Ö»³õÊ¼»¯Ò»´Î¾ÍºÃ
+	
+	// å€¤åŸŸãŒå›ºå®š(0.0, 1.0)ã®ãŸã‚ã€åˆæœŸåŒ–ã¯1å›é™ã‚Šã§ã„ã„ staticä¿®é£¾
 	static uniform_real_distribution<double> distribution(0.0, 1.0);
 	return distribution(generator);
 }
 
 inline double random_double(double min, double max)
 {
-	// ÕâÀïÈ«¾ÖÖ»Ğè1¸öÖÖ×Ó£¬1¸öÎ±Ëæ»úÊıÁĞ£¬Òò´Ë¼ÓstaticĞŞÊÎ   
+	// ã‚°ãƒ­ãƒ¼ãƒãƒ«ã§å˜ä¸€ã®ä¹±æ•°ç”Ÿæˆå™¨ã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚staticä¿®é£¾ 
 	static mt19937 generator;
-	// ÒòÎª·¶Î§ÊÇ¿É±äµÄ£¬ËùÒÔ¿ÉÄÜĞèÒª¶à´Î³õÊ¼»¯£¬²»ÄÜ¼ÓstaticĞŞÊÎ£¡
+	// å€¤åŸŸãŒå¤‰å‹•å¯èƒ½ã®ãŸã‚è¤‡æ•°å›ã®åˆæœŸåŒ–ãŒå¿…è¦ã§ã‚ã‚Šã€staticä¿®é£¾å­ã¯ä½¿ç”¨ç¦æ­¢â€Œ
 	uniform_real_distribution<double> distribution(min, max);
 	return distribution(generator);
 }
