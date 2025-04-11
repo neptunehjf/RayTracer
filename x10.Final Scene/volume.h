@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "common.h"
 #include "hittable.h"
@@ -16,13 +16,16 @@ public:
 		boundary(boundary), neg_inv_density(-1 / density), mat(make_shared<isotropic>(albedo))
 	{}
 
-	// ¸ù¾İÃÜ¶ÈºÍ¸ÅÂÊËã³öÔÚvolumeÄÚ²¿hitµÄÎ»ÖÃ
+	// æ ¹æ®å¯†åº¦å’Œæ¦‚ç‡ç®—å‡ºåœ¨volumeå†…éƒ¨hitçš„ä½ç½®
+	// 
+	// å¯†åº¦ã¨ç¢ºç‡ã«åŸºã¥ãä½“ç©å†…éƒ¨ã®è¡çªä½ç½®ã‚’ç®—å‡º
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
 		hit_record rec1, rec2;
 
-		// ²ÎÕÕreferrence/volume_scatter1.jpg
-		// ÏÈÇó³ö¹âÏßÓëvolume±ß½çÊÇ·ñÓĞ2¸ö½»µã
+		// å‚ç…§referrence/volume_scatter1.jpg
+		// 
+		// ä½“ç©å¢ƒç•Œé¢ã¨å…‰ç·šãŒ2ç‚¹ã§äº¤å·®ã™ã‚‹ã‹ã‚’åˆ¤å®š
 		if (!boundary->hit(r, interval::universe, rec1))
 			return false;
 
@@ -31,27 +34,35 @@ public:
 		if (!boundary->hit(r, intv, rec2))
 			return false;
 
-		// ÒÔÉÏÊÇÓÃuniverseÇó³öµÄ½»µã£¬Êµ¼Ê»¹Òª¿¼ÂÇ¹âÏßÓĞĞ§Çø¼ä
-		// ¹âÏßÓĞĞ§Çø¼ä·¶Î§ÔÚvolume±ß½çÄÚ²¿µÄÇé¿ö£¬Òª°Ñ½»µã¸üĞÂÎªÇø¼äÄÚµÄÖµ
+		// ä»¥ä¸Šæ˜¯ç”¨universeæ±‚å‡ºçš„äº¤ç‚¹ï¼Œå®é™…è¿˜è¦è€ƒè™‘å…‰çº¿æœ‰æ•ˆåŒºé—´
+		// å…‰çº¿æœ‰æ•ˆåŒºé—´èŒƒå›´åœ¨volumeè¾¹ç•Œå†…éƒ¨çš„æƒ…å†µï¼Œè¦æŠŠäº¤ç‚¹æ›´æ–°ä¸ºåŒºé—´å†…çš„å€¼
+		//
+		// æœ‰åŠ¹å…‰ç·šåŒºé–“å†…ã«åã¾ã‚‹ã‚ˆã†äº¤ç‚¹ã‚’ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°
 		if (rec1.t < ray_t.min)
 			rec1.t = ray_t.min;
 		if (rec2.t > ray_t.max)
 			rec2.t = ray_t.max;
 
-		// ÒÔÉÏ¼ÆËãÊÇ¸ù¾İ rec1.t < rec2.t ×÷ÎªÇ°ÌáµÄ£¬ËùÒÔ²»Âú×ãÔò·µ»Øfalse
+		// ä»¥ä¸Šè®¡ç®—æ˜¯æ ¹æ® rec1.t < rec2.t ä½œä¸ºå‰æçš„ï¼Œæ‰€ä»¥ä¸æ»¡è¶³åˆ™è¿”å›false
+		//
+		// äº¤å·®ç‚¹ã®å‰å¾Œé–¢ä¿‚ãŒä¸æ­£ãªå ´åˆ
 		if (rec1.t >= rec2.t)
 			return false;
 
-		// µÚÒ»¸ö½»µãÔÚ¹âÏß·´·½ÏòµÄÇé¿ö£¬°Ñ¹âÏßÔ­µãÊÓÎªµÚÒ»¸ö½»µã
+		// ç¬¬ä¸€ä¸ªäº¤ç‚¹åœ¨å…‰çº¿åæ–¹å‘çš„æƒ…å†µï¼ŒæŠŠå…‰çº¿åŸç‚¹è§†ä¸ºç¬¬ä¸€ä¸ªäº¤ç‚¹
+		// é€†æ–¹å‘äº¤å·®ã®å‡¦ç†ï¼šåŸç‚¹ã‚’å§‹ç‚¹ã¨ã—ã¦å†è¨­å®š
 		if (rec1.t < 0)
 			rec1.t = 0;
 
-		// ¹âÏßËÙ¶ÈµÄ±êÁ¿
+		// å…‰ç·šé€Ÿåº¦ã®ã‚¹ã‚«ãƒ©ãƒ¼é‡
 		double ray_speed = r.direction().length();
-		// ²»·¢ÉúscatterµÄÇé¿öÏÂ£¬¹âÏßÔÚvolumeÄÚ²¿µÄ´«²¥¾àÀë
+
+		// ä¸å‘ç”Ÿscatterçš„æƒ…å†µä¸‹ï¼Œå…‰çº¿åœ¨volumeå†…éƒ¨çš„ä¼ æ’­è·ç¦»
+		// æ•£ä¹±ãªã—ã®å ´åˆã®ä½“ç©å†…ä¼æ’­è·é›¢
 		double distance = ray_speed * (rec2.t - rec1.t);
-		// ¹âÏß·¢ÉúscatterµÄÇé¿öÏÂ£¬¹âÏßvolumeÄÚ²¿µÄ´«²¥¾àÀë
-		// ²ÎÕÕreferrence/volume_scatter2.png
+
+		// å…‰çº¿å‘ç”Ÿscatterçš„æƒ…å†µä¸‹ï¼Œå…‰çº¿volumeå†…éƒ¨çš„ä¼ æ’­è·ç¦»
+		// æ•£ä¹±ç™ºç”Ÿæ™‚ã®ä¼æ’­è·é›¢ï¼ˆreference/volume_scatter2.pngå‚ç…§ï¼‰
 		double hit_distance = neg_inv_density * log(random_double());
 
 		if (hit_distance > distance)
@@ -59,8 +70,8 @@ public:
 
 		rec.t = rec1.t + hit_distance / ray_speed;
 		rec.p = r.at(rec.t);
-		rec.front_face = true;       // ²»¹ØĞÄ£¬ÈÎÒâÖµ¶¼¿ÉÒÔ
-		rec.normal = vec3(1, 0, 0);  // ²»¹ØĞÄ£¬ÈÎÒâÖµ¶¼¿ÉÒÔ
+		rec.front_face = true;       // ä¸è¦ï¼ˆä»»æ„ã®å€¤ã§å¯ï¼‰
+		rec.normal = vec3(1, 0, 0);  // ä¸è¦ï¼ˆä»»æ„ã®å€¤ã§å¯ï¼‰
 		rec.mat = mat;
 	}
 
@@ -70,7 +81,8 @@ public:
 	}
 
 private:
-	shared_ptr<hittable> boundary; // Ö¸¶¨Ò»¸öhittableÎïÌå×÷ÎªvolumeµÄ±ß½ç
-	double neg_inv_density;        // volumeÃÜ¶ÈµÄµ¹ÊıµÄ¸ºÊı£¬¾ßÌå²ÎÕÕreferrence/volume_scatter2.png
-	shared_ptr<material> mat;      // Ìå»ıµÄ²ÄÖÊ
+	shared_ptr<hittable> boundary; // ä½“ç©å¢ƒç•Œã‚’å®šç¾©ã™ã‚‹hittableã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+	double neg_inv_density;        // volumeå¯†åº¦ã®é€†æ•°ã®è² æ•°ï¼ˆreference/volume_scatter2.pngå‚ç…§ï¼‰
+	shared_ptr<material> mat;      // ä½“ç©æè³ª
+
 };

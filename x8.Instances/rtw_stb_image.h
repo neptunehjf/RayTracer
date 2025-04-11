@@ -1,9 +1,9 @@
-#ifndef RTW_STB_IMAGE_H
+﻿#ifndef RTW_STB_IMAGE_H
 #define RTW_STB_IMAGE_H
 
-// ͼƬ��ȡhelper��
-// ����׷�����޹أ����ֱ���õ����ϵĴ���
-// �м������ԸĽ��ĵط�������Ϊʱ��ԭ����ʱ�Ȳ�ϸ����
+// 画像読み込みヘルパークラス
+// レイトレーシング自体とは無関係のため、ウェブ上のコードをそのまま流用
+// いくつか改良可能な箇所があるが、時間の都合上、現時点では詳細な検討は見送り
 
 // Disable strict warnings for this header from the Microsoft Visual C++ compiler.
 #ifdef _MSC_VER

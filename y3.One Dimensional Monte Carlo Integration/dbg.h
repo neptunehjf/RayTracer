@@ -1,13 +1,13 @@
-#pragma once
+ï»¿#pragma once
 
 size_t unhit_count = 0;
 size_t hit_count = 0;
 size_t total_bounce = 0;
 
-/**************Monte Carlo²ÉÑùÏà¹Ø****************/
+/**************Monte Carlo ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°é–¢é€£****************/
 struct sample {
-	double x;   // ²ÉÑùµã
-	double p_x; // ¸Ã²ÉÑùµãµÄ¸ÅÂÊpdf(x)
+	double x;   // ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°åº§æ¨™ç‚¹
+	double p_x; // å½“è©²ç‚¹ã®ç¢ºç‡å¯†åº¦é–¢æ•°å€¤
 };
 
 inline bool compare_by_x(const sample& s1, const sample& s2)
@@ -45,4 +45,4 @@ inline double pdf_quadratic(double x)
 	return 3.0 / 8.0 * x * x;
 }
 
-/**************Monte Carlo²ÉÑùÏà¹Ø****************/
+/**************Monte Carlo ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°é–¢é€£****************/

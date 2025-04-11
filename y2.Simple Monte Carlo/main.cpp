@@ -1,4 +1,4 @@
-#include "common.h"
+ï»¿#include "common.h"
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
@@ -25,7 +25,8 @@ void scene_bouncing_spheres()
             double choose_mat = random_double();
             point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
 
-            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 && // È¥³ıÁËÀë´óÇò¹ıÓÚ½Ó½üµÄĞ¡Çò
+            // å¤§ããªçƒä½“ã«è¿‘æ¥ã—ã™ãã¦ã„ã‚‹å°ã•ãªçƒä½“ã‚’é™¤å»
+            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(-4.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(4.0, 0.2, 0.0)).length() > 1.0)
             {
@@ -37,7 +38,7 @@ void scene_bouncing_spheres()
                     color albedo = color::random() * color::random();
                     sphere_material = make_shared<diffuse>(albedo);
 
-                    // center2µÄÎ»ÖÃ·´Ó¦ÁËÎïÌåµÄÔË¶¯ËÙ¶È
+                    // center2ã®åº§æ¨™å€¤ãŒç‰©ä½“ã®é‹å‹•é€Ÿåº¦ã‚’åæ˜ ã—ã¦ã„ã‚‹
                     point3 center2 = center + vec3(0, random_double(0, 0.5), 0);
                     scene.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
                 }
@@ -101,7 +102,7 @@ void scene_checkered_spheres()
     scene.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<diffuse>(checker_tex)));
     scene.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<diffuse>(checker_tex)));
 
-    // ¶ÔÓÚÎïÌåÊı¼«ÉÙµÄÇé¿ö£¬ÓÃaabb°üÎ§ºĞÓÅ»¯Ëã·¨·´¶øĞ§ÂÊ¸üµÍ
+    //ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæ•°ãŒæ¥µå°‘ã®å ´åˆAABB bboxã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’ä½¿ã£ã¦é€†ã«åŠ¹ç‡ãŒä½ä¸‹
     //scene = hittable_list(make_shared<bvh_node>(scene));
 
     // Camera
@@ -419,16 +420,17 @@ void scene_final(int image_width, int samples_num, int bounce_limit)
     cam.render(scene);
 }
 
-// Í¨¹ıÕı·½ĞÎºÍÆäÄÚÇĞÔ²¹ÀËãPiÖµ
-// ²ÎÕÕreferrence/Monte Carlo Estimating Pi.jpg
+// æ­£æ–¹å½¢ã¨å†…æ¥å††ã«ã‚ˆã‚‹å††å‘¨ç‡Ï€ã®æ¨å®š
+// å‚ç…§referrence/Monte Carlo Estimating Pi.jpg
 void test_monte_carlo()
 {
     clog << fixed << setprecision(12);
 
-    // ÂäÔÚÔ²ÄÚµÄ²ÉÑùÊı
+    // å††å†…ã«è½ã¡ãŸã‚µãƒ³ãƒ—ãƒ«æ•°
     size_t n = 0;
     size_t n_jitter = 0;
-    // ¶¶¶¯²ÉÑùÊıµÄÆ½·½¸ù
+    // æŠ–åŠ¨é‡‡æ ·æ•°çš„å¹³æ–¹æ ¹
+    // ã‚¸ãƒƒã‚¿ãƒ¼ã‚µãƒ³ãƒ—ãƒ«æ•°ã®å¹³æ–¹æ ¹
     size_t sqrt_N_jitter = 1000;
 
     for (int i = 0; i < sqrt_N_jitter; i++)
@@ -439,8 +441,11 @@ void test_monte_carlo()
             if (x * x + y * y < 1)
                 n++;
 
-            // Í¨¹ı·Ö¼¶²ÉÑù(¶¶¶¯)£¬Ê¹²ÉÑù¸ü¾ùÔÈ£¬¼ÓËÙÊÕÁ²
-            // ²ÎÕÕreferrence/Monte Carlo Estimating Pi Jittering.png
+            // é€šè¿‡åˆ†çº§é‡‡æ ·(æŠ–åŠ¨)ï¼Œä½¿é‡‡æ ·æ›´å‡åŒ€ï¼ŒåŠ é€Ÿæ”¶æ•›
+            // 
+            // éšå±¤åŒ–ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ï¼ˆã‚¸ãƒƒã‚¿ãƒ¼ï¼‰ã«ã‚ˆã‚‹ã‚µãƒ³ãƒ—ãƒ«åˆ†å¸ƒã®å‡ä¸€åŒ–ã¨åæŸåŠ é€Ÿå‡¦ç†â€Œ
+            // 
+            // å‚ç…§referrence/Monte Carlo Estimating Pi Jittering.png
             // [0,1) => [-1, 1)
             x = 2 * ((i + random_double()) / sqrt_N_jitter) - 1;
             y = 2 * ((j + random_double()) / sqrt_N_jitter) - 1;
@@ -451,15 +456,16 @@ void test_monte_carlo()
     clog << "Estimated Pi with Jittering: " << 4.0 * n_jitter / (sqrt_N_jitter * sqrt_N_jitter) << endl;
 }
 
-// Í¨¹ıÕı·½ĞÎºÍÆäÄÚÇĞÔ²¹ÀËãPiÖµ
-// ²ÎÕÕreferrence/Monte Carlo Estimating Pi.jpg
+// æ­£æ–¹å½¢ã¨å†…æ¥å††ã«ã‚ˆã‚‹Ï€æ¨å®šã®åæŸæ€§æ¤œè¨¼
+// 
+// å‚ç…§referrence/Monte Carlo Estimating Pi.jpg
 void test_monte_carlo_converage()
 {
     clog << fixed << setprecision(12);
 
-    // ÂäÔÚÔ²ÄÚµÄ²ÉÑùÊı
+    // å††å†…ã‚µãƒ³ãƒ—ãƒ«ã‚«ã‚¦ãƒ³ã‚¿
     size_t n = 0;
-    // ÔËĞĞ¼ÆÊı
+    // ç·è©¦è¡Œå›æ•°
     size_t cnt = 0;
 
     while (true)
@@ -472,7 +478,7 @@ void test_monte_carlo_converage()
         if (x * x + y * y < 1)
             n++;
 
-        // Ã¿¸ô100000´Î²ÉÑù´òÓ¡Ò»´Î½á¹û
+        // 100000å›æ¯ã«çµæœã‚’å‡ºåŠ›
         if (cnt % 100000 == 0)
             clog << "Estimated Pi: " << 4.0 * n / cnt << endl;      
     }
@@ -482,7 +488,7 @@ int main()
 {
     time_t start_time, end_time;
 
-    // ¿ªÊ¼¼ÆÊ±
+    // ã‚¿ã‚¤ãƒŸãƒ³ã‚°é–‹å§‹
     time(&start_time);
 
     switch (7)
@@ -525,7 +531,7 @@ int main()
         break;
     }
 
-    // ½áÊø¼ÆÊ±
+    // ã‚¿ã‚¤ãƒŸãƒ³ã‚°çµ‚äº†
     time(&end_time);
 
     clog << "elapsed time: " << difftime(end_time, start_time) << " seconds\n";

@@ -1,4 +1,4 @@
-#include "common.h"
+ï»¿#include "common.h"
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
@@ -23,7 +23,8 @@ void scene_bouncing_spheres()
             double choose_mat = random_double();
             point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
 
-            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 && // È¥³ıÁËÀë´óÇò¹ıÓÚ½Ó½üµÄĞ¡Çò
+            // å¤§ããªçƒä½“ã«è¿‘æ¥ã—ã™ãã¦ã„ã‚‹å°ã•ãªçƒä½“ã‚’é™¤å»
+            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(-4.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(4.0, 0.2, 0.0)).length() > 1.0)
             {
@@ -35,7 +36,7 @@ void scene_bouncing_spheres()
                     color albedo = color::random() * color::random();
                     sphere_material = make_shared<diffuse>(albedo);
 
-                    // center2µÄÎ»ÖÃ·´Ó¦ÁËÎïÌåµÄÔË¶¯ËÙ¶È
+                    // center2ã®åº§æ¨™å€¤ãŒç‰©ä½“ã®é‹å‹•é€Ÿåº¦ã‚’åæ˜ ã—ã¦ã„ã‚‹
                     point3 center2 = center + vec3(0, random_double(0, 0.5), 0);
                     scene.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
                 }
@@ -99,7 +100,7 @@ void scene_checkered_spheres()
     scene.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<diffuse>(checker_tex)));
     scene.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<diffuse>(checker_tex)));
 
-    // ¶ÔÓÚÎïÌåÊı¼«ÉÙµÄÇé¿ö£¬ÓÃaabb°üÎ§ºĞÓÅ»¯Ëã·¨·´¶øĞ§ÂÊ¸üµÍ
+    //ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæ•°ãŒæ¥µå°‘ã®å ´åˆAABB bboxã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’ä½¿ã£ã¦é€†ã«åŠ¹ç‡ãŒä½ä¸‹
     //scene = hittable_list(make_shared<bvh_node>(scene));
 
     // Camera
@@ -300,7 +301,7 @@ int main()
 {
     time_t start_time, end_time;
 
-    // ¿ªÊ¼¼ÆÊ±
+    // ã‚¿ã‚¤ãƒŸãƒ³ã‚°é–‹å§‹
     time(&start_time);
 
     switch (7)
@@ -330,7 +331,7 @@ int main()
         break;
     }
 
-    // ½áÊø¼ÆÊ±
+    // ã‚¿ã‚¤ãƒŸãƒ³ã‚°çµ‚äº†
     time(&end_time);
 
     clog << "elapsed time: " << difftime(end_time, start_time) << " seconds\n";

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "common.h"
 #include "rtw_stb_image.h"
@@ -9,12 +9,15 @@ class texture
 public:
 	virtual ~texture() = default;
 
-	// u,v UVÓ³ÉäµÄ·½Ê½£¬ÌáÇ°×¼±¸µÄ2D²ÄÖÊÍ¼Æ¬
-	// p   ¿Õ¼ä(spatial)²ÄÖÊµÄ·½Ê½£¬Ã¿´ÎÔÚ½»µã¸ù¾İÎ»ÖÃËã³ö¶ÔÓ¦µÄ²ÄÖÊÑÕÉ«Öµ
+	// u,v UVæ˜ å°„çš„æ–¹å¼ï¼Œæå‰å‡†å¤‡çš„2Dæè´¨å›¾ç‰‡
+	// p   ç©ºé—´(spatial)æè´¨çš„æ–¹å¼ï¼Œæ¯æ¬¡åœ¨äº¤ç‚¹æ ¹æ®ä½ç½®ç®—å‡ºå¯¹åº”çš„æè´¨é¢œè‰²å€¼
+	// 
+	// u,v: UVãƒãƒƒãƒ”ãƒ³ã‚°ç”¨ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
+	// p: ç©ºé–“åº§æ¨™ãƒ™ãƒ¼ã‚¹ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒªãƒ³ã‚°ç”¨ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 	virtual color get_value(double u, double v, const point3& p) const = 0;
 };
 
-// ´¿É«
+// å˜è‰²
 class solid_color : public texture
 {
 public:
@@ -24,7 +27,7 @@ public:
 
 	color get_value(double u, double v, const point3& p) const override
 	{
-		// ´¿É«ÊÇ¹Ì¶¨Öµ
+		// å˜è‰²ã¯å›ºå®šå€¤ã‚’ä½¿ç”¨
 		return albedo;
 	}
 
@@ -32,7 +35,9 @@ private:
 	color albedo;
 };
 
-// ³ÌÊ½»¯Éú³É ÆåÅÌ¸ñ×Ó²ÄÖÊ 
+// ç¨‹å¼åŒ–ç”Ÿæˆ æ£‹ç›˜æ ¼å­æè´¨ 
+//
+// ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ãƒ«ç”Ÿæˆãƒã‚§ãƒƒã‚«ãƒ¼ãƒ‘ã‚¿ãƒ¼ãƒ³
 class checker_texture : public texture
 {
 public:
@@ -42,10 +47,14 @@ public:
 	checker_texture(double density, const color& c1, const color& c2) :
 		checker_texture(density, make_shared<solid_color>(c1), make_shared<solid_color>(c2)) {}
 
-	// ³ÌÊ½»¯Éú³ÉÆæÅ¼½»´íµÄ´¿É«
+	// ç¨‹å¼åŒ–ç”Ÿæˆå¥‡å¶äº¤é”™çš„çº¯è‰²
+	//
+	// 3Dãƒã‚§ãƒƒã‚«ãƒ¼ãƒ‘ã‚¿ãƒ¼ãƒ³ã®ç”Ÿæˆãƒ­ã‚¸ãƒƒã‚¯
 	color get_value(double u, double v, const point3& p) const override
 	{
-		// ×¢Òâfloor·µ»ØÖµºÍ²ÎÊıÒ»ÖÂ£¬ËùÒÔÒªÇ¿ÖÆ×ª»»
+		// æ³¨æ„floorè¿”å›å€¼å’Œå‚æ•°ä¸€è‡´ï¼Œæ‰€ä»¥è¦å¼ºåˆ¶è½¬æ¢
+		//
+		// flooré–¢æ•°ã®æˆ»ã‚Šå€¤å‹ã¯å¼•æ•°ã¨ä¸€è‡´ã•ã›ã‚‹ãŸã‚æ˜ç¤ºçš„ã«ã‚­ãƒ£ã‚¹ãƒˆ
 		auto x_integer = (int)floor(density * p.x());
 		auto y_integer = (int)floor(density * p.y());
 		auto z_integer = (int)floor(density * p.z());
@@ -56,16 +65,23 @@ public:
 	}
 
 private:
-	// ¸ñ×ÓÃÜ¶È¡£densityÔ½´ó£¬¸ñ×ÓÔ½Ğ¡Ô½ÃÜ¼¯£»
-	// ¸ñ×Ó´óĞ¡scale¿ÉÄÜ¸ü·ûºÏÖ±¾õ£¬µ«ÊÇÒòÎªÒª¼ÆËãscaleµÄµ¹Êı£¬Ğ§ÂÊ½ÏµÍ
+	// æ ¼å­å¯†åº¦ã€‚densityè¶Šå¤§ï¼Œæ ¼å­è¶Šå°è¶Šå¯†é›†ï¼›
+	// æ ¼å­å¤§å°scaleå¯èƒ½æ›´ç¬¦åˆç›´è§‰ï¼Œä½†æ˜¯å› ä¸ºè¦è®¡ç®—scaleçš„å€’æ•°ï¼Œæ•ˆç‡è¾ƒä½
+	//
+	// ãƒ‘ã‚¿ãƒ¼ãƒ³ã®å¯†åº¦ï¼ˆå¯†åº¦ãŒé«˜ã„ã»ã©ç´°ã‹ã„ãƒ‘ã‚¿ãƒ¼ãƒ³ï¼‰
+	// scaleãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚ˆã‚Šé™¤ç®—æ¼”ç®—ãŒä¸è¦ãªãŸã‚åŠ¹ç‡çš„
 	double density;
 
-	// ÆæÅ¼½»´íµÄÁ½ÖÖ»¨ÎÆ
+	// å¥‡å¶äº¤é”™çš„ä¸¤ç§èŠ±çº¹
+	// 
+	// äº¤äº’ã«é…ç½®ã™ã‚‹2ç¨®é¡ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£
 	shared_ptr<texture> even;
 	shared_ptr<texture> odd;
 };
 
-// »ùÓÚUVµÄ²ÄÖÊÌùÍ¼
+// åŸºäºUVçš„æè´¨è´´å›¾
+// 
+// ç”»åƒãƒ™ãƒ¼ã‚¹UVãƒ†ã‚¯ã‚¹ãƒãƒ£
 class image_texture : public texture 
 {
 public:
@@ -73,19 +89,21 @@ public:
 
 	color get_value(double u, double v, const point3& p) const override 
 	{
-		// Èç¹ûÃ»¶ÁÈ¡µ½ÌùÍ¼£¬¾Í·µ»ØÇàÉ«
+		// å¦‚æœæ²¡è¯»å–åˆ°è´´å›¾ï¼Œå°±è¿”å›é’è‰²
+		// 
+		// ç”»åƒèª­ã¿è¾¼ã¿å¤±æ•—æ™‚ã®ãƒ•ã‚©ãƒ¼ãƒ«ãƒãƒƒã‚¯ï¼ˆã‚·ã‚¢ãƒ³è‰²ï¼‰
 		if (image.height() <= 0) return color(0.0, 1.0, 1.0);
 
-		// u×ø±ê·¶Î§Ó¦¸ÃÔÚ[0.0,1.0]
+		// uåº§æ¨™ã®ã‚¯ãƒ©ãƒ³ãƒ—å‡¦ç† [0.0, 1.0]ç¯„å›²ã«åˆ¶é™
 		u = interval(0.0, 1.0).clamp(u);
-		// v×ø±ê·¶Î§Ó¦¸ÃÔÚ[1,0]£¬ÒòÎªÊµ¼ÊµÄÍ¼Æ¬×ø±êÊÇºÍÓÒÊÖÏµ×ø±êÔÚy·½ÏòÏà·´µÄ
+		// våº§æ¨™åè»¢å‡¦ç†ï¼ˆç”»åƒåº§æ¨™ç³»ã¨å³æ‰‹åº§æ¨™ç³»ã®Yè»¸æ–¹å‘é•ã„ã‚’è£œæ­£ï¼‰
 		v = 1.0 - interval(0.0, 1.0).clamp(v);
 
 		double i = int(u * image.width());
 		double j = int(v * image.height());
 		const unsigned char* pixel = image.pixel_data(i, j);
 
-		double color_scale = 1.0 / 255.0; // ÕûÊı×ª¸¡µã
+		double color_scale = 1.0 / 255.0; // æ•´æ•°ã‹ã‚‰æµ®å‹•å°æ•°ç‚¹ã¸ã®å¤‰æ›ã‚¹
 		return color(color_scale * pixel[0], color_scale * pixel[1], color_scale * pixel[2]);
 	}
 
@@ -96,7 +114,6 @@ private:
 class noise_texture : public texture
 {
 public:
-	// perlinÓÃÄ¬ÈÏ¹¹ÔìÌå¹¹Ôì£¬²»ĞèÒª²ÎÊı
 	noise_texture(double frenquency) : frenquency(frenquency) {}
 
 	color get_value(double u, double v, const point3& p) const
@@ -105,11 +122,17 @@ public:
 		// return color(1.0, 1.0, 1.0) * 0.5 * (1.0 + noise.noise(frenquency * p));
 
 
-		// ÍÄÁ÷ µş¼Ó7²ã
+		// æ¹æµ å åŠ 7å±‚
+		// 
+		// ä¹±æµåŠ¹æœï¼ˆ7å±¤ã®é‡ç•³ï¼‰
 		//return color(1.0, 1.0, 1.0) * noise.turbulence(p, 7);
 
-		// Éú³É´óÀíÊ¯²ÄÖÊ
-		// ³õÊ¼ÖµÊÇ1.0°×É«£¬ÓÃsin²¨ĞÎÉú³ÉÍ¼°¸£¬zÖá×ø±ê×÷Îª×Ô±äÁ¿£¬ÔÙ¼ÓÉÏÍÄÁ÷µÄÆ«ÒÆ
+		// ç”Ÿæˆå¤§ç†çŸ³æè´¨
+		// åˆå§‹å€¼æ˜¯0.5ï¼Œç”¨sinæ³¢å½¢ç”Ÿæˆå›¾æ¡ˆï¼Œzè½´åæ ‡ä½œä¸ºè‡ªå˜é‡ï¼Œå†åŠ ä¸Šæ¹æµçš„åç§»
+		// 
+		// å¤§ç†çŸ³æ¨¡æ§˜ç”Ÿæˆãƒ­ã‚¸ãƒƒã‚¯
+		// ãƒ™ãƒ¼ã‚¹ã‚«ãƒ©ãƒ¼0.5ï¼ˆã‚°ãƒ¬ã‚¤ï¼‰ã«æ­£å¼¦æ³¢ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’é©ç”¨
+		// Zåº§æ¨™ã‚’ä½ç›¸å¤‰åŒ–ã®è»¸ã¨ã—ã¦ä½¿ç”¨ï¼‹ä¹±æµã«ã‚ˆã‚‹å¤‰èª¿
 		return color(0.5, 0.5, 0.5) * (1.0 + sin(frenquency * p.z() + 10 * noise.turbulence(p, 7)));
 	}
 
