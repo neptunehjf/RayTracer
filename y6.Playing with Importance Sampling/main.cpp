@@ -1,4 +1,4 @@
-#include "common.h"
+ï»¿#include "common.h"
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
@@ -25,7 +25,8 @@ void scene_bouncing_spheres()
             double choose_mat = random_double();
             point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
 
-            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 && // È¥³ıÁËÀë´óÇò¹ıÓÚ½Ó½üµÄĞ¡Çò
+            // å¤§ããªçƒä½“ã«è¿‘æ¥ã—ã™ãã¦ã„ã‚‹å°ã•ãªçƒä½“ã‚’é™¤å»
+            if ((center - point3(0.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(-4.0, 0.2, 0.0)).length() > 1.0 &&
                 (center - point3(4.0, 0.2, 0.0)).length() > 1.0)
             {
@@ -37,7 +38,7 @@ void scene_bouncing_spheres()
                     color albedo = color::random() * color::random();
                     sphere_material = make_shared<diffuse>(albedo);
 
-                    // center2µÄÎ»ÖÃ·´Ó¦ÁËÎïÌåµÄÔË¶¯ËÙ¶È
+                    // center2ã®åº§æ¨™å€¤ãŒç‰©ä½“ã®é‹å‹•é€Ÿåº¦ã‚’åæ˜ ã—ã¦ã„ã‚‹
                     point3 center2 = center + vec3(0, random_double(0, 0.5), 0);
                     scene.add(make_shared<sphere>(center, center2, 0.2, sphere_material));
                 }
@@ -101,7 +102,7 @@ void scene_checkered_spheres()
     scene.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<diffuse>(checker_tex)));
     scene.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<diffuse>(checker_tex)));
 
-    // ¶ÔÓÚÎïÌåÊı¼«ÉÙµÄÇé¿ö£¬ÓÃaabb°üÎ§ºĞÓÅ»¯Ëã·¨·´¶øĞ§ÂÊ¸üµÍ
+    //ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæ•°ãŒæ¥µå°‘ã®å ´åˆAABB bboxã‚¢ãƒ«ã‚´ãƒªã‚ºãƒ ã‚’ä½¿ã£ã¦é€†ã«åŠ¹ç‡ãŒä½ä¸‹
     //scene = hittable_list(make_shared<bvh_node>(scene));
 
     // Camera
@@ -420,14 +421,15 @@ void scene_final(int image_width, int samples_num, int bounce_limit)
     cam.render(scene);
 }
 
-// Í¨¹ıÕı·½ĞÎºÍÆäÄÚÇĞÔ²¹ÀËãPiÖµ
-// ²ÎÕÕreferrence/Monte Carlo Estimating Pi.jpg
+// æ­£æ–¹å½¢ã¨å†…æ¥å††ã«ã‚ˆã‚‹å††å‘¨ç‡Ï€ã®æ¨å®š
+// å‚ç…§referrence/Monte Carlo Estimating Pi.jpg
 void test_monte_carlo_pi()
 {
-    // ÂäÔÚÔ²ÄÚµÄ²ÉÑùÊı
+    // å††å†…ã«è½ã¡ãŸã‚µãƒ³ãƒ—ãƒ«æ•°
     size_t n = 0;
     size_t n_jitter = 0;
-    // ¶¶¶¯²ÉÑùÊıµÄÆ½·½¸ù
+    // æŠ–åŠ¨é‡‡æ ·æ•°çš„å¹³æ–¹æ ¹
+    // ã‚¸ãƒƒã‚¿ãƒ¼ã‚µãƒ³ãƒ—ãƒ«æ•°ã®å¹³æ–¹æ ¹
     size_t sqrt_N_jitter = 1000;
 
     for (int i = 0; i < sqrt_N_jitter; i++)
@@ -438,8 +440,11 @@ void test_monte_carlo_pi()
             if (x * x + y * y < 1)
                 n++;
 
-            // Í¨¹ı·Ö¼¶²ÉÑù(¶¶¶¯)£¬Ê¹²ÉÑù¸ü¾ùÔÈ£¬¼ÓËÙÊÕÁ²
-            // ²ÎÕÕreferrence/Monte Carlo Estimating Pi Jittering.png
+            // é€šè¿‡åˆ†çº§é‡‡æ ·(æŠ–åŠ¨)ï¼Œä½¿é‡‡æ ·æ›´å‡åŒ€ï¼ŒåŠ é€Ÿæ”¶æ•›
+            // 
+            // éšå±¤åŒ–ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ï¼ˆã‚¸ãƒƒã‚¿ãƒ¼ï¼‰ã«ã‚ˆã‚‹ã‚µãƒ³ãƒ—ãƒ«åˆ†å¸ƒã®å‡ä¸€åŒ–ã¨åæŸåŠ é€Ÿå‡¦ç†â€Œ
+            // 
+            // å‚ç…§referrence/Monte Carlo Estimating Pi Jittering.png
             // [0,1) => [-1, 1)
             x = 2 * ((i + random_double()) / sqrt_N_jitter) - 1;
             y = 2 * ((j + random_double()) / sqrt_N_jitter) - 1;
@@ -452,15 +457,16 @@ void test_monte_carlo_pi()
     clog << "Estimated Pi with Jittering: " << 4.0 * n_jitter / (sqrt_N_jitter * sqrt_N_jitter) << endl;
 }
 
-// Í¨¹ıÕı·½ĞÎºÍÆäÄÚÇĞÔ²¹ÀËãPiÖµ
-// ²ÎÕÕreferrence/Monte Carlo Estimating Pi.jpg
+// æ­£æ–¹å½¢ã¨å†…æ¥å††ã«ã‚ˆã‚‹Ï€æ¨å®šã®åæŸæ€§æ¤œè¨¼
+// 
+// å‚ç…§referrence/Monte Carlo Estimating Pi.jpg
 void test_monte_carlo_pi_converage()
 {
     clog << fixed << setprecision(12);
 
-    // ÂäÔÚÔ²ÄÚµÄ²ÉÑùÊı
+    // å††å†…ã‚µãƒ³ãƒ—ãƒ«ã‚«ã‚¦ãƒ³ã‚¿
     size_t n = 0;
-    // ÔËĞĞ¼ÆÊı
+    // ç·è©¦è¡Œå›æ•°
     size_t cnt = 0;
 
     while (true)
@@ -473,18 +479,18 @@ void test_monte_carlo_pi_converage()
         if (x * x + y * y < 1)
             n++;
 
-        // Ã¿¸ô100000´Î²ÉÑù´òÓ¡Ò»´Î½á¹û
+        // 100000å›æ¯ã«çµæœã‚’å‡ºåŠ›
         if (cnt % 100000 == 0)
             clog << "Estimated Pi: " << 4.0 * n / cnt << endl;      
     }
 }
 
-// ÓÃmonte carloÇóx2ÔÚ[0,2]ÉÏµÄ»ı·Ö
+// xÂ²ã®[0,2]åŒºé–“ã«ãŠã‘ã‚‹ç©åˆ†ã‚’ãƒ¢ãƒ³ãƒ†ã‚«ãƒ«ãƒ­æ³•ã§è¨ˆç®—
 void test_monte_carlo_integrate_x2()
 {
-    // ×Ü²ÉÑùÊı
+    // ç·ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ•°
     size_t N = 1000000;
-    // ²ÉÑù·¶Î§interval[0,2]
+    // ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°åŒºé–“ [0,2]
     int a = 0, b = 2;
 
     double sum = 0;
@@ -496,43 +502,49 @@ void test_monte_carlo_integrate_x2()
     }
 
     clog << fixed << setprecision(12);
-    // integrate = interval * average£¬²ÉÑù´ÎÊıNÔ½¶à£¬averageÔ½½Ó½üexpect
+    // integrate = interval * averageï¼Œé‡‡æ ·æ¬¡æ•°Nè¶Šå¤šï¼Œaverageè¶Šæ¥è¿‘expect
+    // ç©åˆ†å€¤ = åŒºé–“å¹… Ã— å¹³å‡å€¤ï¼ˆã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ•°â†‘â‡’å¹³å‡å€¤ã¯æœŸå¾…å€¤ã«åæŸï¼‰
     clog << "Integrate of x2: " << (b - a) * (sum / N) << endl;
 }
 
-// ÓÃmonte carloÇó¸´ÔÓpdfº¯ÊıµÄhalfway point£¨Ö¸¸ÕºÃ°Ñ¸ÅÂÊ»ı·Ö¶Ô°ë·ÖµÄ²ÉÑùµã£©
-// ¸´ÔÓpdfº¯Êı²ÎÕÕreferrence/complex_pdf.png
-// Èç¹ûµİ¹éÏÂÈ¥£¬¿ÉÒÔÍ¨¹ı¸ÅÂÊ»ı·ÖµÃµ½Ã¿Ò»¸ö²ÉÑùµã
-// Ëµ°×ÁË¾ÍÊÇ½¨Á¢pdfµÄ»ı·ÖÓë²ÉÑùµãµÄÁªÏµ
+// ç”¨monte carloæ±‚å¤æ‚pdfå‡½æ•°çš„halfway pointï¼ˆæŒ‡åˆšå¥½æŠŠæ¦‚ç‡ç§¯åˆ†å¯¹åŠåˆ†çš„é‡‡æ ·ç‚¹ï¼‰
+// å¤æ‚pdfå‡½æ•°å‚ç…§referrence/complex_pdf.png
+// å¦‚æœé€’å½’ä¸‹å»ï¼Œå¯ä»¥é€šè¿‡æ¦‚ç‡ç§¯åˆ†å¾—åˆ°æ¯ä¸€ä¸ªé‡‡æ ·ç‚¹
+// è¯´ç™½äº†å°±æ˜¯å»ºç«‹pdfçš„ç§¯åˆ†ä¸é‡‡æ ·ç‚¹çš„è”ç³»
+//
+// è¤‡é›‘ãªç¢ºç‡å¯†åº¦é–¢æ•°(pdf)ã®halfway pointï¼ˆç¢ºç‡ç©åˆ†ã‚’äºŒåˆ†ã™ã‚‹ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ç‚¹ï¼‰ã‚’ãƒ¢ãƒ³ãƒ†ã‚«ãƒ«ãƒ­æ³•ã§ç®—å‡º
+// å‚ç…§ referrence/complex_pdf.png
+// å†å¸°çš„ã«é©ç”¨ã™ã‚‹ã“ã¨ã§å„ã‚µãƒ³ãƒ—ãƒ«ç‚¹ã®ç¢ºç‡ç©åˆ†å€¤ã‚’å–å¾—å¯èƒ½
+// è¦ç´„ï¼špdfã®ç©åˆ†æ›²ç·šã¨ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ç‚¹ã®å¯¾å¿œé–¢ä¿‚æ§‹ç¯‰
 void test_monte_carlo_halfway_point()
 {
-    // ×Ü²ÉÑùÊı
+    // ç·ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ•°
     const size_t N = 10000;
-    // ²ÉÑùÊı×é
+    // ã‚µãƒ³ãƒ—ãƒ«æ ¼ç´é…åˆ—
     sample spl[N] = { 0 };
-    // ²ÉÑù·¶Î§interval[0,2 * pi]
+    // ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°åŒºé–“ [0, 2Ï€]
     double a = 0, b = 2 * pi;
-    // ËùÓĞ²ÉÑùµãµÄpdf×ÜºÍ
+    // å…¨ã‚µãƒ³ãƒ—ãƒ«ç‚¹ã®pdfç·å’Œ
     double sum = 0;
-    // 2piµÄµ¹Êı£¬ÌáÇ°¼ÆËãÒÔÌá¸ßĞ§ÂÊ
+    // è¨ˆç®—åŠ¹ç‡åŒ–ã®ãŸã‚2Ï€ã®é€†æ•°ã‚’äº‹å‰è¨ˆç®—
     double inv_2pi = 1 / (2 * pi);
 
     for (int i = 0; i < N; i++)
     {
-        double x = random_double(a, b); //²ÉÑùµã
+        double x = random_double(a, b); // ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ç‚¹
         double sin_x = sin(x);
         double p_x = exp(-x * inv_2pi) * sin_x * sin_x; //pdf(x)
         sum += p_x;
 
-        // ²ÉÑù½á¹û´æÈëÊı×é(Î´ÅÅĞò)
+        // æœªã‚½ãƒ¼ãƒˆçŠ¶æ…‹ã§é…åˆ—ã«æ ¼ç´
         spl[i].x = x;
         spl[i].p_x = p_x;
     }
 
-    // °´x´ÓĞ¡µ½´óË³ĞòÅÅĞò²ÉÑùÊı×é
+    // xå€¤ã®æ˜‡é †ã§ã‚µãƒ³ãƒ—ãƒ«é…åˆ—ã‚’ã‚½ãƒ¼ãƒˆ
     sort(begin(spl), end(spl), compare_by_x);
 
-    // ¼ÆËãhalfway point
+    // halfway pointè®¡ç®—
     double half_sum = sum / 2;
     double halfway_point;
     double accum = 0;
@@ -553,9 +565,8 @@ void test_monte_carlo_halfway_point()
     clog << "Halfway point: " << halfway_point << endl;
 }
 
-// Monte CarloÖ®ÖØÒªĞÔ²ÉÑù Çóx2ÔÚ[0,2]ÉÏµÄ»ı·Ö
-// ²ÎÕÕreferrence/Inverse Method.jpg
-// ²ÎÕÕreferrence/Importance Sampling.png
+// é‡ç‚¹ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ³•ã«ã‚ˆã‚‹xÂ²ã®[0,2]åŒºé–“ç©åˆ†è¨ˆç®—
+// å‚ç…§referrence/Importance Sampling.jpg çš„
 void test_importance_sampling_x2()
 {
     cout << fixed << setprecision(12);
@@ -563,52 +574,65 @@ void test_importance_sampling_x2()
     double sum = 0;
 
     cout << "Sample nums = " << N << endl;
-    // pdfÎª³£Êıº¯Êı(µÈÓÚÃ»ÓĞÖØÒªĞÔ²ÉÑù£¬µ«ÊÇ¿ÉÒÔ»ùÓÚ´ËÀ©Õ¹³ÉÏßĞÔº¯Êı£¬¶ş´Îº¯ÊıµÈ)
+    // pdfä¸ºå¸¸æ•°å‡½æ•°(ç­‰äºæ²¡æœ‰é‡è¦æ€§é‡‡æ ·ï¼Œä½†æ˜¯å¯ä»¥åŸºäºæ­¤æ‰©å±•æˆçº¿æ€§å‡½æ•°ï¼ŒäºŒæ¬¡å‡½æ•°ç­‰)
+    // ä¸€æ§˜åˆ†å¸ƒpdfé©ç”¨ä¾‹ï¼ˆé‡ç‚¹ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æœªä½¿ç”¨ã ãŒç·šå½¢/äºŒæ¬¡é–¢æ•°ã¸æ‹¡å¼µå¯èƒ½ï¼‰
     for (int i = 0; i < N; i++) 
     {
         double x = icd_uniform(random_double());
-        sum += x * x / pdf_uniform(x); // ³ıÒÔpdfÏàµ±ÓÚ³ËÒÔinterval
+        sum += x * x / pdf_uniform(x); // pdfé™¤ç®—ï¼åŒºé–“å¹…ä¹—ç®—
     }
     
     cout << "Integrate of x2 with uniform pdf = " << (sum / N) << endl;
 
-    // pdfÎªÏßĞÔº¯Êı
+    // ç·šå½¢åˆ†å¸ƒpdfé©ç”¨
     sum = 0;
 
     for (int i = 0; i < N; i++)
     {
         double d = random_double();
-        if (d < 1e-8) // ·ÀÖ¹NaNµÄÇé¿ö
+        if (d < 1e-8) // NaNé˜²æ­¢å‡¦ç†
             continue;
         double x = icd_linear(d);
-        sum += x * x / pdf_linear(x); // ³ıÒÔpdfÏàµ±ÓÚ³ËÒÔinterval
+        sum += x * x / pdf_linear(x); // pdfé™¤ç®—ï¼åŒºé–“å¹…ä¹—ç®—
     }
 
     cout << "Integrate of x2 with linear pdf = " << (sum / N) << endl;
 
-    // pdfÎª¶ş´Îº¯Êı
+    // äºŒæ¬¡é–¢æ•°åˆ†å¸ƒpdfé©ç”¨
     sum = 0;
     for (int i = 0; i < N; i++)
     {
         double d = random_double();
-        if (d < 1e-8) // ·ÀÖ¹NaNµÄÇé¿ö
+        if (d < 1e-8) // NaNé˜²æ­¢å‡¦ç†
             continue;
         double x = icd_quadratic(d);
-        sum += x * x / pdf_quadratic(x); // ³ıÒÔpdfÏàµ±ÓÚ³ËÒÔinterval
+        sum += x * x / pdf_quadratic(x); // pdfé™¤ç®—ï¼åŒºé–“å¹…ä¹—ç®—
     }
     cout << "Integrate of x2 with quadratic pdf = " << (sum / N) << endl;
 }
 
-// ÓÃmonte carloÇócos_thetaµÄÆ½·½ÔÚ¸÷¸ö·½ÏòÉÏµÄ»ı·Ö thetaÊÇËæ»ú·½ÏòÏòÁ¿ÓëzÖáµÄ¼Ğ½Ç
-// ¸÷¸ö·½ÏòÉÏµÄ»ı·Ö¿ÉÒÔ¿´×÷ÊÇÔÚµ¥Î»ÇòÌåÉÏµÄ»ı·Ö
-// µ¥Î»ÇòÌå£¬·½ÏòÏòÁ¿³¤¶ÈÎª1£¬ËùÒÔcos_theta = 1 * cos_theta = d.z
-// µ¥Î»ÇòÌåµÄÇé¿öÏÂ£¬¿ÉÒÔ°Ñ3DÏòÁ¿µÄ²ÉÑù×ª³É¶Ô2DÆ½ÃæµÄ²ÉÑù¡£2D²ÉÑùÒª±È3D²ÉÑù¿ìµÃ¶à
-// ¾ùÔÈ²ÉÑùµÄ»° pdf = 1 / ÇòÌåÃæ»ı = 1 / 4pi
+// ç”¨monte carloæ±‚cos_thetaçš„å¹³æ–¹åœ¨å„ä¸ªæ–¹å‘ä¸Šçš„ç§¯åˆ† thetaæ˜¯éšæœºæ–¹å‘å‘é‡ä¸zè½´çš„å¤¹è§’
+// å„ä¸ªæ–¹å‘ä¸Šçš„ç§¯åˆ†å¯ä»¥çœ‹ä½œæ˜¯åœ¨å•ä½çƒä½“ä¸Šçš„ç§¯åˆ†
+// å•ä½çƒä½“ï¼Œæ–¹å‘å‘é‡é•¿åº¦ä¸º1ï¼Œæ‰€ä»¥cos_theta = 1 * cos_theta = d.z
+// å•ä½çƒä½“çš„æƒ…å†µä¸‹ï¼Œå¯ä»¥æŠŠ3Då‘é‡çš„é‡‡æ ·è½¬æˆå¯¹2Då¹³é¢çš„é‡‡æ ·ã€‚2Dé‡‡æ ·è¦æ¯”3Dé‡‡æ ·å¿«å¾—å¤š
+// å‡åŒ€é‡‡æ ·çš„è¯ pdf = 1 / çƒä½“é¢ç§¯ = 1 / 4pi
+//
+// ãƒ¢ãƒ³ãƒ†ã‚«ãƒ«ãƒ­æ³•ã«ã‚ˆã‚‹å˜ä½çƒé¢ä¸Šã®cosÎ¸^2ç©åˆ†è¨ˆç®—
+// Î¸: ãƒ©ãƒ³ãƒ€ãƒ æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã¨zè»¸ã®ãªã™è§’
+// 1. æ–¹å‘ç©åˆ†ã®çƒé¢è¡¨ç¾:
+//    å…¨æ–¹å‘ã®ç©åˆ†ã¯å˜ä½çƒé¢(åŠå¾„1)ä¸Šã®ç©åˆ†ã¨ç­‰ä¾¡
+// 2. å¹¾ä½•å­¦çš„ç°¡ç•¥åŒ–:
+//    å˜ä½çƒé¢ä¸Šã§ã¯æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«é•·=1 â‡’ cosÎ¸ = d.z()æˆåˆ†ã§ç›´æ¥è¨ˆç®—å¯èƒ½
+// 3. åŠ¹ç‡çš„ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æˆ¦ç•¥:
+//    3Dçƒé¢ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ã‚’2Dãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç©ºé–“(Î¸,Ï†)ã¸å°„å½±
+//    â†’ è¨ˆç®—é‡å‰Šæ¸›ã®ãŸã‚æ¥µåº§æ¨™ç³»ã‚’åˆ©ç”¨
+// 4. ä¸€æ§˜ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ™‚ã®ç¢ºç‡å¯†åº¦:
+//    pdf = 1 / çƒé¢è¡¨é¢ç© = 1/(4Ï€) ï¼ˆçƒé¢è¡¨é¢ç©å…¬å¼ S=4Ï€rÂ²ï¼‰
 void test_cos2_on_unit_sphere()
 {
-    // ×Ü²ÉÑùÊı
+    // ç·ã‚µãƒ³ãƒ—ãƒ«æ•°
     size_t N = 1000000;
-    // ²ÉÑùÏòÁ¿
+    // ã‚µãƒ³ãƒ—ãƒ«ãƒªãƒ³ã‚¯ãƒ™ã‚¯ãƒˆãƒ«
     vec3 d;
 
     double sum = 0;
@@ -627,7 +651,7 @@ int main()
 {
     time_t start_time, end_time;
 
-    // ¿ªÊ¼¼ÆÊ±
+    // ã‚¿ã‚¤ãƒŸãƒ³ã‚°é–‹å§‹
     time(&start_time);
 
     switch (7)
@@ -682,7 +706,7 @@ int main()
         break;
     }
 
-    // ½áÊø¼ÆÊ±
+    // ã‚¿ã‚¤ãƒŸãƒ³ã‚°çµ‚äº†
     time(&end_time);
 
     clog << "elapsed time: " << difftime(end_time, start_time) << " seconds\n";

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include"onb.h"
 
@@ -7,14 +7,14 @@ class pdf
 public:
 	virtual ~pdf() = default;
 
-	// Éú³É·ûºÏpdf·Ö²¼µÄËæ»ú²ÉÑù·½Ïò
+    // PDFåˆ†å¸ƒã«å¾“ã†ãƒ©ãƒ³ãƒ€ãƒ ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ–¹å‘ã‚’ç”Ÿæˆ
 	virtual vec3 generate() const = 0;
 
-	// ¸ù¾İ²ÉÑù·½Ïò·µ»Ø¶ÔÓ¦µÄpdfÖµ
+	// ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°æ–¹å‘ã«å¯¾å¿œã™ã‚‹PDFå€¤ã‚’è¿”ã™
 	virtual double value(const vec3& direction) const = 0;
 };
 
-// ÔÚµ¥Î»ÇòÌå¾ùÔÈ²ÉÑù
+// å˜ä½çƒä½“ä¸Šã§å‡ä¸€ã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°ã‚’å®Ÿè¡Œ
 class sphere_pdf : public pdf
 {
 public:
@@ -32,7 +32,7 @@ public:
 	}
 };
 
-// lambertian²ÉÑù
+// lambertianã‚µãƒ³ãƒ—ãƒªãƒ³ã‚°
 class cosine_pdf : public pdf
 {
 public:
@@ -41,16 +41,15 @@ public:
 
 	vec3 generate() const override
 	{
-		// ÏÈ¸ù¾İzÖáÉú³ÉËæ»úÏòÁ¿£¬ÔÙ°Ñ×ø±êÏµ×ª³É·¨Ïß×÷ÎªzÖáµÄ×ø±ê¿Õ¼ä(ÇĞÏß×ø±ê)
-		// ²Î¿¼referrence/lambertian reflection.png
 		return uvw.transform(random_cosine_direction());
 	}
 
-	// ²ÎÕÕreferrence/Lambertian Scatter PDF.jpg
+	// å‚ç…§referrence/Lambertian Scatter PDF.jpg
 	double value(const vec3& direction) const override
 	{
 		double cosine_theta = dot(unit_vector(direction), uvw.w());
-		// ·ÀÖ¹É¢Éä·½ÏòÔÚÆ½ÃæÒÔÏÂµÄÇé¿ö
+		// é˜²æ­¢æ•£å°„æ–¹å‘åœ¨å¹³é¢ä»¥ä¸‹çš„æƒ…å†µ
+		// ã‚µãƒ¼ãƒ•ã‚§ã‚¹æ³•ç·šæ–¹å‘ã¨åå¯¾å´ã®æ•£ä¹±æ–¹å‘ã‚’é˜²æ­¢
 		return fmax(0, cosine_theta / pi);
 	}
 private:
@@ -79,7 +78,8 @@ private:
 	point3 origin;
 };
 
-// »ìºÏÃÜ¶Èpdf£¬¶Ô²»Í¬pdf¼ÓÈ¨£¬¼ÓÈ¨×ÜºÍÒªµÈÓÚ1
+// æ··åˆå¯†åº¦pdfï¼Œå¯¹ä¸åŒpdfåŠ æƒï¼ŒåŠ æƒæ€»å’Œè¦ç­‰äº1
+// è¤‡åˆå¯†åº¦PDFï¼šç•°ãªã‚‹PDFã«é‡ã¿ä»˜ã‘ã€ç·å’ŒãŒ1ã«ç­‰ã—ã„ã“ã¨ã‚’ä¿è¨¼
 class mixture_pdf : public pdf 
 {
 public:
