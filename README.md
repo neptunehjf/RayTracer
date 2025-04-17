@@ -43,10 +43,10 @@ GPUではなくCPU上で動作するソフトウェアレイトレーサー(Soft
 -   ‌**y4.Monte Carlo Integration on the Sphere of Directions** - 球面方向上の積分計算
 -   ‌**y6.Playing with Importance Sampling** - 重要度サンプリング準備のための陽関数化PDF
 -   ‌**y7.Generating Random Directions** -  ランダム方向を生成し、各サンプリングpdfがcos³θ積分への収束性検証
--   ‌**y8.Orthonormal Bases** - 正規直交基底を用いて、z軸を法線として生成されたランダム方向を各法線方向に適用します
+-   ‌**y8.Orthonormal Bases** - 正規直交基底を用いて、法線をz軸として生成されたランダム方向を各法線方向に適用
 -   ‌**y9.Sampling Lights Directly** - 重点サンプリングを用いて散乱光線を光源方向に誘導（光源バイアスPDF）することでノイズを大幅に低減しますが、局所的な黒潰れを生じさせる問題があります
 -   ‌**y10.Mixture Densities** - Lambertian分布PDFと光源バイアスPDFの重み付け合成により、光源バイアスPDF単独使用時の局所的な黒潰れ問題を改善
--   ‌**y12.Cleaning Up PDF Management** -  最終版 PDF管理モジュールの最適化を実装
+-   ‌**y12.Cleaning Up PDF Management** -  最終版Cornell Boxシーン PDF管理モジュールの最適化を実装
 
 ※ コード中のコメントは一応日本語化していますが、自分用のメモとして中国語のコメントも多く残っています。悪しからずご了承ください。
 
