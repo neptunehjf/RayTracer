@@ -9,14 +9,13 @@ GPUではなくCPU上で動作するソフトウェアレイトレーサー(Soft
 ‌**技術スタック**‌
 
 -   ‌**プログラミング言語**‌: C++
--   ‌**理論基盤**‌: グラフィックス学、数学、物理
--   ‌**パフォーマンス最適化**‌: AABB Bounding Box、Monte Carloサンプリング、重要性サンプリングなど
--   ‌**ツール**‌: VS Performance Profiler、VS Debugger、Photoshopなど
+-   ‌**理論基盤**‌: グラフィックス学、数学、物理、信号画像処理
+-   ‌**ツール**‌: Viusal Studio2022、Photoshopなど
 
 ‌**プロジェクト構成**‌
 
--   ‌**referrence** - 参考文献
--   ‌**Dependency** - 依存関係ファイル
+-   ‌**referrence** - 参照資料（自分で数学式の導出プロセスも含む）
+-   ‌**Dependency** - 依存ファイル
 -   ‌**2.OutputImage** - PPM形式の画像出力
 -   ‌**3.Vec3Class** - vec3とcolorのユーティリティクラス  
 -   ‌**4.SendRay** - カメラからビューポートへの光線発射  
@@ -53,14 +52,39 @@ GPUではなくCPU上で動作するソフトウェアレイトレーサー(Soft
 
 
 ‌**実行方法**‌  
-Visual Studio 2022で該当プロジェクトの`.sln`ファイルを開き、コンパイル後、VS 2022のデバッガーで実行します。
+-   画像が上書きされるのを防ぐため、実行前にプロジェクトディレクトリ内の既存画像を削除する必要があります
+-   Visual Studio 2022で該当プロジェクトの`.sln`ファイルを開き、コンパイル後、VS 2022のデバッガーで実行します
 
-‌**成果画像の例**‌  
+‌**成果の例**‌  
+-   解像度：1200 x 675
+-   ピクセル毎の‌サンプル数：500
+-   ‌AABB BBox最適化：有効
+-   ‌重点サンプリング最適化：無効
+-   ‌レンダリング時間：秒
 <img src="https://github.com/user-attachments/assets/db9a82b9-dc5d-40e6-b583-717d53215a77" width="800px" />
+<br>
+<br>
+<br>
+
+-   解像度：800 x 800
+-   ピクセル毎の‌サンプル数：10000
+-   ‌AABB BBox最適化：有効
+-   ‌重点サンプリング最適化：無効
+-   ‌レンダリング時間：24497秒
 <img src="https://github.com/user-attachments/assets/0e843bb5-3f90-4a4b-a6c4-8baa2bb51936" width="800px" />
+<br>
+<br>
+<br>
+
+-   解像度：600 x 600
+-   ピクセル毎の‌サンプル数：1000
+-   ‌AABB BBox最適化：無効
+-   ‌重点サンプリング最適化：有効
+-   ‌レンダリング時間：371秒
 <img src="https://github.com/user-attachments/assets/c29ab6b7-3d50-4be9-baf0-97b02d241f6d" width="800px" />
-
-
+<br>
+<br>
+<br>
 
 ‌**連絡先**‌  
 koalahjf@gmail.com
