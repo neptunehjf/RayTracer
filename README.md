@@ -60,7 +60,7 @@ GPUではなくCPU上で動作するソフトウェアレイトレーサー(Soft
 -   ピクセル毎の‌サンプル数：500
 -   ‌AABB Bounding Box最適化：有効
 -   ‌重点サンプリング：無効
--   ‌レンダリング時間：秒
+-   ‌レンダリング時間：2789秒
 <img src="https://github.com/user-attachments/assets/db9a82b9-dc5d-40e6-b583-717d53215a77" width="800px" />
 <br>
 <br>
