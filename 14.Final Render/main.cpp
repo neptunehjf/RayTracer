@@ -6,6 +6,11 @@
 
 int main() 
 {
+    time_t start_time, end_time;
+
+    // タイミング開始
+    time(&start_time);
+
     // Camera
     camera cam;
     cam.aspect_radio = 16.0 / 9.0;
@@ -76,4 +81,10 @@ int main()
 
     // Render
     cam.render(scene);
+
+    // タイミング終了
+    time(&end_time);
+
+    clog << "elapsed time: " << difftime(end_time, start_time) << " seconds\n";
+    cin.get();
 }
